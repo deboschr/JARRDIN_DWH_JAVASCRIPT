@@ -1,0 +1,14 @@
+{
+	"dwh": {
+		"host": "jadiin-developer.com",
+		"dbName": "jadiinde_jarrdin_dwh",
+		"username": "jadiinde_jarrdin_dwh",
+		"password": "XV6HFaZvU5FNuJ9EVdLX"
+	},
+	"stg": {
+		"host": "jadiin-developer.com",
+		"dbName": "jadiinde_jarrdin_stg",
+		"username": "jadiinde_jarrdin_stg",
+		"password": "3UBETVp9Se8VsKVUBeJy"
+	}
+}
