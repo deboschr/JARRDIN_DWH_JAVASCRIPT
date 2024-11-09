@@ -2,7 +2,6 @@ const express = require("express");
 const dotenv = require("dotenv");
 const routes = require("./routes.js");
 const { exec } = require("child_process");
-const database = require("./config/database.json");
 const app = express();
 
 dotenv.config({ path: "./config/.env" });

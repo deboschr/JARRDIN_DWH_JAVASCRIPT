@@ -1,5 +1,5 @@
 import json
-from connection import create_connection
+from connection import create_connection, close_connection
 from extract import extract_data
 from transform import transform_data
 from load import load_data
@@ -14,28 +14,37 @@ def load_db_config():
 
 
 # Fungsi ETL lengkap
-def etl_process():
+def etl_process(source, target):
     # Memuat konfigurasi database
     db_config = load_db_config()
 
     # Membuat koneksi untuk operasional dan staging
-    opt_conn = create_connection(db_config['opt'])
-    stg_conn = create_connection(db_config['stg'])
+    source_conn = create_connection(db_config[source])
+    target_conn = create_connection(db_config[target])
 
-    if opt_conn and stg_conn:
-        # Extract data dari database operasional
-        data = extract_data(opt_conn)
+    if source_conn and target_conn:
         
-        if data:
-            # Transformasi data jika perlu
-            transformed_data = transform_data(data)
+        if source == "opt" and target == "stg":
+            # Extract data dari database operasional
+            data = extract_data(source_conn)
             
-            # Load data ke database staging
-            load_data(stg_conn, transformed_data)
+            # Load data ke stanging
+            load_data(target_conn, data)
+        elif source == "stg" and target == "dwh":
+            # Extract data dari database staging
+            data = extract_data(source_conn)
+            
+            # Transform data sebelum di load
+            data_transfomerd = transform_data(data)
+            
+            # Load data ke data warehouse
+            load_data(target_conn, data)
+        else:
+            # kembalikan pesan error
+            print("Invalid source and target.")
         
-        # Menutup koneksi
-        opt_conn.close()
-        stg_conn.close()
+        close_connection(db_config[source]["dbName"])
+        close_connection(db_config[target]["dbName"])
 
 # Menjalankan proses ETL
 if __name__ == "__main__":
