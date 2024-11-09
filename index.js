@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Fungsi untuk membuat koneksi default
 function runConnection() {
-	exec("python3 utils/db-connection.py", (error, stdout, stderr) => {
+	exec("python3 services/connection.py", (error, stdout, stderr) => {
 		if (error) {
 			console.error(`Koneksi gagal: ${stderr}`);
 			return;
