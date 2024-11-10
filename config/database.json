@@ -13,20 +13,14 @@
 	},
 	"opt1": {
 		"host": "jadiin-developer.com",
-		"dbName": "jadiinde_sparks_dev",
-		"username": "jadiinde_sparks_dev",
-		"password": "S=pEqfzdQ.!BG^6%<$xV#rLK>w/F`b(W-9;Xmen&j)*3Jh}:R]"
+		"dbName": "jadiinde_jarrdin_opt1",
+		"username": "jadiinde_jarrdin_opt1",
+		"password": "76a4ELsFxPkRhhaUeJEX"
 	},
 	"opt2": {
 		"host": "jadiin-developer.com",
-		"dbName": "jadiinde_jarrdin_stg",
-		"username": "jadiinde_jarrdin_stg",
-		"password": "3UBETVp9Se8VsKVUBeJy"
-	},
-	"opt3": {
-		"host": "jadiin-developer.com",
-		"dbName": "jadiinde_jarrdin_stg",
-		"username": "jadiinde_jarrdin_stg",
-		"password": "3UBETVp9Se8VsKVUBeJy"
+		"dbName": "jadiinde_jarrdin_opt2",
+		"username": "jadiinde_jarrdin_opt2",
+		"password": "BvcWSJg7v3ew6umLUGkC"
 	}
 }

@@ -1,84 +1,151 @@
 const schedule = require("node-schedule");
+const { exec } = require("child_process");
+
+const mysql = require("mysql2");
+const dbConfig = {
+	host: "jadiin-developer.com",
+	user: "jadiinde_jarrdin_dwh",
+	password: "XV6HFaZvU5FNuJ9EVdLX",
+	database: "jadiinde_jarrdin_dwh",
+};
+const connection = mysql.createConnection(dbConfig);
 
 class Scheduler {
 	static JOBS = {};
 
+	// Fungsi untuk menjadwalkan job
 	static async createTask(dataJob) {
-		// Mendefinisikan rule
 		const rule = new schedule.RecurrenceRule();
+		// Parsing time dari dataJob.time
+		const [hour, minute, second] = dataJob.time.split(":").map(Number);
+		rule.hour = hour;
+		rule.minute = minute;
+		rule.second = second;
 
-		switch (config.Period) {
+		switch (dataJob.period) {
 			case "MINUTE":
-				rule.minute = new schedule.Range(0, 59, config.Step);
+				rule.minute = new schedule.Range(0, 59, dataJob.step);
 				break;
 			case "HOUR":
-				rule.hour = new schedule.Range(0, 23, config.Step);
+				rule.hour = new schedule.Range(0, 23, dataJob.step);
 				break;
 			case "DAY":
-				rule.dayOfWeek = new schedule.Range(0, 6, config.Step);
+				rule.dayOfWeek = new schedule.Range(0, 6, dataJob.step);
 				break;
 			case "MONTH":
-				rule.month = new schedule.Range(0, 11, config.Step);
+				rule.month = new schedule.Range(0, 11, dataJob.step);
 				break;
 			case "YEAR":
-				rule.year = new Date().getFullYear() + config.Step;
+				rule.year = new Date().getFullYear() + dataJob.step;
 				break;
 			default:
 				throw new Error("Periode tidak valid");
 		}
 
-		// Atur endDate pada rule untuk interval
-		rule.end = new Date(config.EndDate);
-
-		// UPSERT job ke db here
-
-		// Jadwalkan job
+		// Menjadwalkan job
 		const newJob = schedule.scheduleJob(dataJob.name, rule, async () => {
 			console.log(`Job ${dataJob.name} dijalankan pada:`, new Date());
 
-			// UPSERT job di db here
+			const source = dataJob.config.source;
+			const target = dataJob.config.target;
+			const lastExecuteTime = 0;
+
+			exec(
+				`python3 services/etl.py ${source} ${target} ${lastExecuteTime}`,
+				(error, stdout, stderr) => {
+					if (error) {
+						console.error(`Eksekusi gagal: ${stderr}`);
+						return;
+					}
+					console.log(stdout);
+				}
+			);
 		});
 
-		// Simpan instance job
+		// Simpan job ke dalam JOBS
 		this.JOBS[dataJob.name] = newJob;
+
+		if (dataJob.type === "NEW") {
+			// Insert atau update job di database
+			const query = `
+				INSERT INTO job (name, time, step, period, config) 
+				VALUES (?, ?, ?, ?, ?) 
+				ON DUPLICATE KEY UPDATE 
+					time = VALUES(time), 
+					step = VALUES(step), 
+					period = VALUES(period), 
+					config = VALUES(config)
+				`;
+
+			const values = [
+				dataJob.name,
+				dataJob.time,
+				dataJob.step,
+				dataJob.period,
+				JSON.stringify(dataJob.config),
+			];
+
+			connection.execute(query, values, (err, results) => {
+				if (err) {
+					console.error("Error saat menyimpan job:", err);
+				} else {
+					console.log(`Job ${dataJob.name} berhasil dijadwalkan dan disimpan.`);
+				}
+			});
+		}
 	}
 
-	// Fungsi untuk membatalkan job berdasarkan ID
+	// Fungsi untuk membatalkan job berdasarkan nama
 	static async cancelTask(name) {
-		// mendapatkan instance job
 		const job = this.JOBS[name];
 
 		if (job) {
-			// menghentikan job
+			// Hentikan job
 			job.cancel();
 
-			// menghapus instance job
+			// Hapus job dari JOBS
 			delete this.JOBS[name];
 
-			// menghapus job di database
-			await JobModel.destroy({ where: { name: name } });
-
-			console.log(`Job ${name} telah dibatalkan dan dihapus dari database.`);
+			// Hapus job dari database
+			const query = `DELETE FROM job WHERE name = ?`;
+			connection.execute(query, [name], (err, results) => {
+				if (err) {
+					console.error("Error saat menghapus job:", err);
+				} else {
+					console.log(
+						`Job ${name} telah dibatalkan dan dihapus dari database.`
+					);
+				}
+			});
 		} else {
 			console.log(`Job ${name} tidak ditemukan atau sudah dibatalkan.`);
 		}
 	}
 
-	// Fungsi untuk memuat ulang job yang belum selesai dari database saat server mulai
+	// Fungsi untuk memuat ulang job dari database saat server mulai
 	static async loadJobsFromDB() {
-		// Mendapatkan semua job dari database
-		const activeJobs =
-			// Menjadwalkan ulang semua job
+		const query = `SELECT * FROM job`;
+
+		connection.execute(query, (err, activeJobs) => {
+			if (err) {
+				console.error("Error saat memuat ulang job:", err);
+				return;
+			}
+
+			// Menjadwalkan ulang semua job berdasarkan data yang diambil dari database
 			activeJobs.forEach((dataJob) => {
-				this.scheduleTask({
+				this.createTask({
 					name: dataJob.name,
 					time: dataJob.time,
 					step: dataJob.step,
 					period: dataJob.period,
-					Config: JSON.parse(dataJob.Config),
+					config: JSON.parse(dataJob.config),
+					type: "OLD",
 				});
 			});
-		console.log("Semua job cost telah dimuat ulang dari database.");
+
+			console.log("Semua job telah dimuat ulang dari database.");
+		});
 	}
 }
 

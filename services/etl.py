@@ -1,5 +1,6 @@
 import pymysql
 import json
+import sys
 from connection import create_connection, close_connection
 
 # Fungsi untuk memuat konfigurasi database
@@ -137,14 +138,15 @@ def main(source, target, time_last_load):
                     # Ekstrak data dari database operasional
                     extracted_data = extract_data(source_conn, table_name, time_last_load)
                     
-                    if extracted_data:
-                        for table, data in extracted_data.items():
-                            # Transformasi data jika target adalah data warehouse
-                            if target == "dwh":
-                                data = transform_data(data)
+                    print(extracted_data)
+                    # if extracted_data:
+                    #     for table, data in extracted_data.items():
+                    #         # Transformasi data jika target adalah data warehouse
+                    #         if target == "dwh":
+                    #             data = transform_data(data)
                             
-                            # Load data ke staging atau data warehouse
-                            load_data(target_conn, table, data, target)
+                    #         # Load data ke staging atau data warehouse
+                    #         load_data(target_conn, table, data, target)
                 
         except pymysql.MySQLError as e:
             print(f"Error saat proses ETL: {e}")
@@ -153,4 +155,11 @@ def main(source, target, time_last_load):
             close_connection(target)
 
 if __name__ == "__main__":
-    main("opt", "stg", "2024-01-01 00:00:00")
+    # Mengambil parameter dari command line
+    if len(sys.argv) > 3:
+        source = sys.argv[1]
+        target = sys.argv[2]
+        time_last_load = int(sys.argv[3])
+        main(source, target, time_last_load)
+    else:
+        print("Parameter tidak lengkap!")
