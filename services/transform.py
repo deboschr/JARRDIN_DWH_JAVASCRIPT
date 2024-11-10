@@ -1,5 +1,5 @@
 # Fungsi untuk mentransformasi data sesuai kebutuhan
-def transform_data(data):
+def transform_data(stg_conn, dwh_conn, data):
     transformed_data = []
     for row in data:
         # Transformasi data sesuai kebutuhan

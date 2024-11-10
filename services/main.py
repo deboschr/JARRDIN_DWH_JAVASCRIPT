@@ -1,3 +1,4 @@
+import pymysql
 import json
 from connection import create_connection, close_connection
 from extract import extract_data
@@ -14,7 +15,7 @@ def load_db_config():
 
 
 # Fungsi ETL lengkap
-def etl_process(source, target):
+def etl_process(source, target, time_last_load):
     # Memuat konfigurasi database
     db_config = load_db_config()
 
@@ -25,20 +26,31 @@ def etl_process(source, target):
     if source_conn and target_conn:
         
         if source == "opt" and target == "stg":
-            # Extract data dari database operasional
-            data = extract_data(source_conn)
+            try:
+                with source_conn.cursor() as cursor:
+                    cursor.execute("SHOW TABLES")
+                    tables = cursor.fetchall()
+                    
+                    for (table_name,) in tables:
+                        # Extract data dari database operasional
+                        data = extract_data(source_conn, table_name, time_last_load)
+                        
+                        # Load data ke stanging
+                        load_data(target_conn, data)
+                
+            except pymysql.MySQLError as e:
+                print(f"Error saat mengekstrak data: {e}")
+                return None
             
-            # Load data ke stanging
-            load_data(target_conn, data)
         elif source == "stg" and target == "dwh":
             # Extract data dari database staging
             data = extract_data(source_conn)
             
             # Transform data sebelum di load
-            data_transfomerd = transform_data(data)
+            data_transfomerd = transform_data(source_conn, target_conn, data)
             
             # Load data ke data warehouse
-            load_data(target_conn, data)
+            load_data(target_conn, data_transfomerd)
         else:
             # kembalikan pesan error
             print("Invalid source and target.")

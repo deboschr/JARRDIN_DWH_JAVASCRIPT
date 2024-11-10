@@ -1,12 +1,10 @@
-const {
-	CategoryRepository,
-} = require("../database/repositories/CategoryRepository");
+const { Scheduler } = require("../utils/Scheduler");
 const { Validator } = require("../utils/validator");
 
-class CategoryController {
+class ScheduleController {
 	static async getAll(req, res) {
 		try {
-			const { error } = Validator.getAllCategory(req.query);
+			const { error } = Validator.getAllSchedule(req.query);
 
 			if (error) {
 				const newError = new Error(error.details[0].message);
@@ -14,12 +12,12 @@ class CategoryController {
 				throw newError;
 			}
 
-			let readCategory = await CategoryRepository.readAll(req.query, {
+			let readSchedule = await Scheduler.readAll(req.query, {
 				EnterpriseID: req.dataLogin.EnterpriseID,
 				OutletID: req.dataSession.OutletID,
 			});
 
-			res.status(200).json(readCategory);
+			res.status(200).json(readSchedule);
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });
@@ -28,12 +26,12 @@ class CategoryController {
 
 	static async getOne(req, res) {
 		try {
-			let readCategory = await CategoryRepository.readOne(req.params.id, {
+			let readSchedule = await Scheduler.readOne(req.params.id, {
 				EnterpriseID: req.dataLogin.EnterpriseID,
 				OutletID: req.dataSession.OutletID,
 			});
 
-			res.status(200).json(readCategory);
+			res.status(200).json(readSchedule);
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });
@@ -42,23 +40,13 @@ class CategoryController {
 
 	static async post(req, res) {
 		try {
-			let { error } = Validator.createCategory(req.body, req.dataSession);
+			const dataJob = {};
 
-			if (error) {
-				const newError = new Error(error.details[0].message);
-				newError.status = 400;
-				throw newError;
-			}
-
-			const createCategory = await CategoryRepository.create(req.body, {
-				EnterpriseID: req.dataLogin.EnterpriseID,
-				OutletID: req.dataSession.OutletID,
-				SparkUserID: req.dataLogin.SparkUserID,
-			});
+			const createSchedule = await Scheduler.scheduleTask(req.body);
 
 			res.status(200).json({
 				success: true,
-				data: createCategory,
+				data: createSchedule,
 			});
 		} catch (error) {
 			console.error(error);
@@ -68,7 +56,7 @@ class CategoryController {
 
 	static async patch(req, res) {
 		try {
-			let { error } = Validator.updateCategory(req.body);
+			let { error } = Validator.updateSchedule(req.body);
 
 			if (error) {
 				const newError = new Error(error.details[0].message);
@@ -76,7 +64,7 @@ class CategoryController {
 				throw newError;
 			}
 
-			const updateCategory = await CategoryRepository.update(req.body, {
+			const updateSchedule = await Scheduler.update(req.body, {
 				EnterpriseID: req.dataLogin.EnterpriseID,
 				OutletID: req.dataSession.OutletID,
 				SparkUserID: req.dataLogin.SparkUserID,
@@ -84,7 +72,7 @@ class CategoryController {
 
 			res.status(200).json({
 				success: true,
-				data: updateCategory,
+				data: updateSchedule,
 			});
 		} catch (error) {
 			console.error(error);
@@ -94,7 +82,7 @@ class CategoryController {
 
 	static async delete(req, res) {
 		try {
-			const deleteCategory = await CategoryRepository.delete(
+			const deleteSchedule = await Scheduler.delete(
 				req.params.id,
 				req.dataLogin.EnterpriseID
 			);
@@ -107,4 +95,4 @@ class CategoryController {
 	}
 }
 
-module.exports = { CategoryController };
+module.exports = { ScheduleController };
