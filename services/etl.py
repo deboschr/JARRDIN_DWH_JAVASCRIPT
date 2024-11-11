@@ -153,3 +153,9 @@ def etl_process(source, target, time_last_load):
         finally:
             close_connection(db_config[source]["dbName"])
             close_connection(db_config[target]["dbName"])
+
+if __name__ == "__main__":
+    source = sys.argv[1]
+    target = sys.argv[2]
+    time_last_load = sys.argv[3]
+    etl_process(source, target, time_last_load)

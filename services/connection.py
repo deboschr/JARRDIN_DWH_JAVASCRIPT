@@ -23,13 +23,13 @@ def create_connection(dataDb):
                 database=dataDb['dbName']
             )
             
-            print(f"Koneksi ke {dbName} berhasil!")
+            print(f">> Koneksi ke {dbName} berhasil!")
             return CONNECTIONS[dbName]
         except pymysql.MySQLError as e:
-            print(f"Error saat membuat koneksi ke {dbName}: {e}")
+            print(f">> Error saat membuat koneksi ke {dbName}: {e}")
             return None
     else:
-        print(f"Koneksi ke {dbName} sudah ada.")
+        print(f">> Koneksi ke {dbName} sudah ada.")
         return CONNECTIONS[dbName]
 
 # Fungsi untuk menutup koneksi
@@ -44,14 +44,14 @@ def close_connection(dbName):
             # Menghapus koneksi dari dictionary setelah ditutup
             del CONNECTIONS[dbName]
             
-            print(f"Koneksi ke {dbName} ditutup.")
+            print(f">> Koneksi ke {dbName} ditutup.")
             
             return True
         except pymysql.MySQLError as e:
-            print(f"Error saat menutup koneksi ke {dbName}: {e}")
+            print(f">> Error saat menutup koneksi ke {dbName}: {e}")
             return False
     else:
-        print(f"Tidak ada koneksi yang ditemukan untuk {dbName}.")
+        print(f">> Tidak ada koneksi yang ditemukan untuk {dbName}.")
         return False
 
 # Fungsi untuk mendapatkan koneksi
@@ -65,7 +65,7 @@ def get_connection(dbName=None):
         return CONNECTIONS[dbName]
     
     else:
-        print(f"Tidak ada koneksi yang ditemukan untuk {dbName}.")
+        print(f">> Tidak ada koneksi yang ditemukan untuk {dbName}.")
         return None
 
 def main():

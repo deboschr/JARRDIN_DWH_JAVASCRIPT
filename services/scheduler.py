@@ -18,7 +18,6 @@ def load_db_config():
       return json.load(f)
 
 def create_job(data_job, dwh_conn):
-   
    # Parse time input to extract hour, minute, and second
    total_seconds = int(data_job["time"].total_seconds())
    hour = total_seconds // 3600
@@ -39,30 +38,33 @@ def create_job(data_job, dwh_conn):
 
    # Define the job function
    def job_function():
-      print(f"Job dijalankan! Sekarang: {datetime.now()}")
-      
-      config = data_job["config"]
-      
-      # Memanggil proses ETL
-      etl_process(config["source"], config["target"], data_job["last_execute"])
-      
       try:
+         print(f"Job {data_job['name']} dijalankan! Sekarang: {datetime.now()}")
+         
+         config = data_job["config"]
+         
+         etl_process(config["source"], config["target"], data_job["last_execute"])
+         
          with dwh_conn.cursor() as cursor:
-            # Gunakan query parameterized untuk menghindari masalah SQL injection
             query = "UPDATE job SET last_execute = NOW() WHERE job_id = %s"
             cursor.execute(query, (data_job["id"],))
+         
+         print(f"Job {data_job['name']} selesai dijalankan.")
+      except Exception as e:
+         print(f"Error pada job {data_job['name']}: {e}")
 
-      except pymysql.MySQLError as e:
-         print(f"Error saat update last_execute pada job: {e}")
-         return None
 
    
    # Add the job to the global_scheduler and save its job ID in the dictionary
    new_job = global_scheduler.add_job(job_function, trigger, id=data_job["name"])
-   print(f"Jon {data_job["name"]} berhasil dibuat.")
+   print(f">> Jon {data_job['name']} berhasil dibuat.")
    
    global_jobs[data_job["name"]] = new_job
-   print(f"Jon {data_job["name"]} berhasil disimpan.")
+   print(f">> Jon {data_job['name']} berhasil disimpan.")
+   
+   print("trigger: ", trigger)
+   print("new_job: ", new_job)
+   print("global_jobs: ", global_jobs)
 
 def cancel_job(name):
     """Cancel a specific job by its job name (ID)."""

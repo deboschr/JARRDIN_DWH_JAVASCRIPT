@@ -1,5 +1,6 @@
 const schedule = require("node-schedule");
 const { exec } = require("child_process");
+const { spawn } = require("child_process");
 
 const mysql = require("mysql2");
 const dbConfig = {
@@ -36,26 +37,30 @@ class Scheduler {
 
 			const source = dataJob.config.source;
 			const target = dataJob.config.target;
-			const lastExecuteTime = this.timeRule(
-				new Date(),
-				dataJob.step,
-				dataJob.period,
-				"date"
-			).toISOString();
-			// .toLocaleString();
+			const lastExecuteTime = dataJob.last_execute;
 
-			console.log("lastExecuteTime", lastExecuteTime);
+			const pythonProcess = spawn("python3", [
+				"services/etl.py",
+				source,
+				target,
+				lastExecuteTime,
+			]);
 
-			exec(
-				`python3 services/etl.py ${source} ${target} ${lastExecuteTime}`,
-				(error, stdout, stderr) => {
-					if (error) {
-						console.error(`Eksekusi gagal: ${error}`);
-						return;
-					}
-					console.log(stdout);
-				}
-			);
+			pythonProcess.stdout.on("data", (data) => {
+				console.log(`stdout: ${data}`);
+			});
+
+			pythonProcess.stderr.on("data", (data) => {
+				console.error(`stderr: ${data}`);
+			});
+
+			pythonProcess.on("error", (error) => {
+				console.error(`Eksekusi gagal: ${error.message}`);
+			});
+
+			pythonProcess.on("close", (code) => {
+				console.log(`ETL process exited with code: ${code}`);
+			});
 		});
 
 		// Simpan job ke dalam JOBS
@@ -139,6 +144,7 @@ class Scheduler {
 					step: dataJob.step,
 					period: dataJob.period,
 					config: JSON.parse(dataJob.config),
+					last_execute: dataJob.last_execute,
 					status: "OLD",
 				});
 			});
