@@ -56,9 +56,13 @@ def create_job(data_job, dwh_conn):
          print(f"Error saat update last_execute pada job: {e}")
          return None
 
+   
    # Add the job to the global_scheduler and save its job ID in the dictionary
    new_job = global_scheduler.add_job(job_function, trigger, id=data_job["name"])
+   print(f"Jon {data_job["name"]} berhasil dibuat.")
+   
    global_jobs[data_job["name"]] = new_job
+   print(f"Jon {data_job["name"]} berhasil disimpan.")
 
 def cancel_job(name):
     """Cancel a specific job by its job name (ID)."""
@@ -86,13 +90,6 @@ def load_job():
          for job in jobs:
             data_job = dict(zip(columns, job))  # Memetakan hasil query menjadi dictionary
             
-            # Mendapatkan waktu saat ini
-            current_time = datetime.now()
-            
-            print("data_job :", data_job)
-            print("current_time :", current_time)
-            print("time :", data_job["time"])
-            print("last_execute :", data_job["last_execute"])
             create_job(data_job, dwh_conn)
    except pymysql.MySQLError as e:
       print(f"Error saat mengekstrak data: {e}")
