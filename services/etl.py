@@ -14,9 +14,9 @@ def load_db_config():
         print("Configuration file not found.")
         sys.exit(1)
 
-def extract_data(conn, table_name, time_last_load, batch_size=500):
+def extract_data(source_conn, table_name, time_last_load, batch_size=500):
     try:
-        with conn.cursor() as cursor:
+        with source_conn.cursor() as cursor:
             # Mendapatkan informasi kolom
             cursor.execute(f"SHOW COLUMNS FROM {table_name}")
             columns = cursor.fetchall()
@@ -37,7 +37,7 @@ def extract_data(conn, table_name, time_last_load, batch_size=500):
                 extracted_data = []
 
                 while True:
-                    df = pd.read_sql(query, conn, params=(time_last_load, batch_size, offset))
+                    df = pd.read_sql(query, source_conn, params=(time_last_load, batch_size, offset))
                     if df.empty:
                         break
                     extracted_data.append(df)
@@ -91,6 +91,9 @@ def load_data(target_conn, data, table_name, table_info, target):
 
     # Memasukkan data ke tabel
     if not data.empty:        
+        # Menambahkan kolom `loaded_at` pada DataFrame sebelum dimasukkan ke database
+        data["loaded_at"] = datetime.now()
+        
         # Melakukan insert data menggunakan pandas
         data.to_sql(target_table, target_conn, if_exists='append', index=False)
         print(f"{len(data)} baris data dimasukkan ke tabel {target_table}.")
@@ -122,8 +125,8 @@ def etl_process(source, target, time_last_load):
         except pymysql.MySQLError as e:
             print(f"Error during ETL process: {e}")
         finally:
-            close_connection(db_config[source]["name"])
-            close_connection(db_config[target]["name"])
+            close_connection(db_config[source]["dbName"])
+            close_connection(db_config[target]["dbName"])
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
