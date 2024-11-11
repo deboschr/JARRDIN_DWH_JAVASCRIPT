@@ -36,41 +36,62 @@ class Scheduler {
 
 			const source = dataJob.config.source;
 			const target = dataJob.config.target;
-			const lastExecuteTime = dataJob.last_execute;
 
-			const pythonProcess = spawn("python3", [
-				"services/etl.py",
-				source,
-				target,
-				lastExecuteTime,
-			]);
-
-			pythonProcess.stdout.on("data", (data) => {
-				console.log(`stdout: ${data}`);
-			});
-
-			pythonProcess.stderr.on("data", (data) => {
-				console.error(`stderr: ${data}`);
-			});
-
-			pythonProcess.on("error", (error) => {
-				console.error(`Eksekusi gagal: ${error.message}`);
-			});
-
-			pythonProcess.on("close", (code) => {
-				console.log(`ETL process exited with code: ${code}`);
-			});
-
-			// Update last_execute di database setelah job dijalankan
-			const query = `UPDATE job SET last_execute = ? WHERE name = ?`;
-			const values = [new Date(), dataJob.name];
-
-			connection.execute(query, values, (err, results) => {
+			// Ambil nilai last_execute terbaru dari database sebelum menjalankan ETL
+			const query = `SELECT last_execute FROM job WHERE name = ?`;
+			connection.execute(query, [dataJob.name], (err, results) => {
 				if (err) {
-					console.error("Error saat update job:", err);
-				} else {
-					console.log(`>> Job ${dataJob.name} berhasil diupdate.`);
+					console.error("Error saat mengambil last_execute:", err);
+					return;
 				}
+
+				// Pastikan ada hasil dan mengambil last_execute
+				const lastExecuteTime = results[0]?.last_execute;
+				if (!lastExecuteTime) {
+					console.error(
+						`Tidak ditemukan last_execute untuk job ${dataJob.name}`
+					);
+					return;
+				}
+
+				// Ubah lastExecuteTime menjadi format ISO string jika diperlukan
+				const lastExecuteISO = new Date(lastExecuteTime).toISOString();
+
+				// Jalankan proses ETL dengan last_execute terbaru
+				const pythonProcess = spawn("python3", [
+					"services/etl.py",
+					source,
+					target,
+					lastExecuteISO,
+				]);
+
+				pythonProcess.stdout.on("data", (data) => {
+					console.log(`stdout: ${data}`);
+				});
+
+				pythonProcess.stderr.on("data", (data) => {
+					console.error(`stderr: ${data}`);
+				});
+
+				pythonProcess.on("error", (error) => {
+					console.error(`Eksekusi gagal: ${error.message}`);
+				});
+
+				pythonProcess.on("close", (code) => {
+					console.log(`ETL process exited with code: ${code}`);
+				});
+
+				// Update last_execute di database setelah job dijalankan
+				const updateQuery = `UPDATE job SET last_execute = ? WHERE name = ?`;
+				const updateValues = [new Date(), dataJob.name];
+
+				connection.execute(updateQuery, updateValues, (err, results) => {
+					if (err) {
+						console.error("Error saat update job:", err);
+					} else {
+						console.log(`>> Job ${dataJob.name} berhasil diupdate.`);
+					}
+				});
 			});
 		});
 
@@ -80,15 +101,15 @@ class Scheduler {
 		if (dataJob.status === "NEW") {
 			// Insert atau update job di database
 			const query = `
-        INSERT INTO job (name, time, step, period, config, last_execute) 
-        VALUES (?, ?, ?, ?, ?, ?) 
-        ON DUPLICATE KEY UPDATE 
-          time = VALUES(time), 
-          step = VALUES(step), 
-          period = VALUES(period), 
-          config = VALUES(config),
-          last_execute = VALUES(last_execute)
-      `;
+      		INSERT INTO job (name, time, step, period, config, last_execute) 
+      		VALUES (?, ?, ?, ?, ?, ?) 
+      		ON DUPLICATE KEY UPDATE 
+        			time = VALUES(time), 
+        			step = VALUES(step), 
+        			period = VALUES(period), 
+        			config = VALUES(config),
+        			last_execute = VALUES(last_execute)
+    			`;
 
 			const values = [
 				dataJob.name,
