@@ -1,8 +1,7 @@
 const schedule = require("node-schedule");
-const { exec } = require("child_process");
 const { spawn } = require("child_process");
-
 const mysql = require("mysql2");
+
 const dbConfig = {
 	host: "jadiin-developer.com",
 	user: "jadiinde_jarrdin_dwh",
@@ -18,15 +17,15 @@ class Scheduler {
 	static async createTask(dataJob) {
 		let rule = new schedule.RecurrenceRule();
 
+		// Parsing waktu jika periode bukan MINUTE atau HOUR
 		if (dataJob.period !== "MINUTE" && dataJob.period !== "HOUR") {
-			// Parsing time dari dataJob.time
 			const [hour, minute, second] = dataJob.time.split(":").map(Number);
 			rule.hour = hour;
 			rule.minute = minute;
 			rule.second = second;
 		}
 
-		rule = this.timeRule(rule, dataJob.step, dataJob.period, "job");
+		rule = this.timeRule(rule, dataJob.step, dataJob.period);
 
 		// Menjadwalkan job
 		const newJob = schedule.scheduleJob(dataJob.name, rule, async () => {
@@ -61,6 +60,18 @@ class Scheduler {
 			pythonProcess.on("close", (code) => {
 				console.log(`ETL process exited with code: ${code}`);
 			});
+
+			// Update last_execute di database setelah job dijalankan
+			const query = `UPDATE job SET last_execute = ? WHERE name = ?`;
+			const values = [new Date(), dataJob.name];
+
+			connection.execute(query, values, (err, results) => {
+				if (err) {
+					console.error("Error saat update job:", err);
+				} else {
+					console.log(`>> Job ${dataJob.name} berhasil diupdate.`);
+				}
+			});
 		});
 
 		// Simpan job ke dalam JOBS
@@ -69,14 +80,15 @@ class Scheduler {
 		if (dataJob.status === "NEW") {
 			// Insert atau update job di database
 			const query = `
-				INSERT INTO job (name, time, step, period, config) 
-				VALUES (?, ?, ?, ?, ?) 
-				ON DUPLICATE KEY UPDATE 
-					time = VALUES(time), 
-					step = VALUES(step), 
-					period = VALUES(period), 
-					config = VALUES(config)
-				`;
+        INSERT INTO job (name, time, step, period, config, last_execute) 
+        VALUES (?, ?, ?, ?, ?, ?) 
+        ON DUPLICATE KEY UPDATE 
+          time = VALUES(time), 
+          step = VALUES(step), 
+          period = VALUES(period), 
+          config = VALUES(config),
+          last_execute = VALUES(last_execute)
+      `;
 
 			const values = [
 				dataJob.name,
@@ -84,6 +96,7 @@ class Scheduler {
 				dataJob.step,
 				dataJob.period,
 				JSON.stringify(dataJob.config),
+				new Date(),
 			];
 
 			connection.execute(query, values, (err, results) => {
@@ -93,7 +106,6 @@ class Scheduler {
 					console.log(
 						`>> Job ${dataJob.name} berhasil dijadwalkan dan disimpan.`
 					);
-					return results;
 				}
 			});
 		}
@@ -154,44 +166,30 @@ class Scheduler {
 	}
 
 	// Fungsi untuk mendapatkan waktu eksekusi terakhir
-	static timeRule(date, step, period, type) {
-		if (type === "date") period = "HOUR";
-
-		const periodActions = {
-			MINUTE: {
-				job: () => (date.minute = new schedule.Range(0, 59, step)),
-				date: () => date.setMinutes(date.getMinutes() - step),
-			},
-			HOUR: {
-				job: () => (date.hour = new schedule.Range(0, 23, step)),
-				date: () => date.setHours(date.getHours() - step),
-			},
-			DAY: {
-				job: () => (date.dayOfWeek = new schedule.Range(0, 6, step)),
-				date: () => date.setDate(date.getDate() - step),
-			},
-			MONTH: {
-				job: () => (date.month = new schedule.Range(0, 11, step)),
-				date: () => date.setMonth(date.getMonth() - step),
-			},
-			YEAR: {
-				job: () => (date.year = new Date().getFullYear() + step),
-				date: () => date.setFullYear(date.getFullYear() - step),
-			},
-		};
-
-		const actionType = type === "job" ? "job" : "date";
-		const periodAction = periodActions[period];
-
-		if (!periodAction) {
-			throw new Error(
-				"Invalid period. Must be 'MINUTE', 'HOUR', 'DAY', 'MONTH', or 'YEAR'."
-			);
+	static timeRule(rule, step, period) {
+		switch (period) {
+			case "MINUTE":
+				rule.minute = new schedule.Range(0, 59, step);
+				break;
+			case "HOUR":
+				rule.hour = new schedule.Range(0, 23, step);
+				break;
+			case "DAY":
+				rule.dayOfWeek = new schedule.Range(0, 6, step);
+				break;
+			case "MONTH":
+				rule.month = new schedule.Range(0, 11, step);
+				break;
+			case "YEAR":
+				rule.year = new Date().getFullYear() + step;
+				break;
+			default:
+				throw new Error(
+					"Invalid period. Must be 'MINUTE', 'HOUR', 'DAY', 'MONTH', or 'YEAR'."
+				);
 		}
 
-		periodAction[actionType]();
-
-		return date;
+		return rule;
 	}
 }
 
