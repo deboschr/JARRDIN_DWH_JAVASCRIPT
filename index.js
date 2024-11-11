@@ -9,8 +9,6 @@ dotenv.config({ path: "./config/.env" });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const { spawn } = require("child_process");
-
 async function initializeApp() {
 	await Scheduler.loadJobsFromDB();
 

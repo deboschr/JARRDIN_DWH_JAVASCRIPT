@@ -5,6 +5,7 @@ from connection import create_connection, close_connection
 from datetime import datetime
 from dateutil import parser
 import pandas as pd
+from sqlalchemy import create_engine
 
 def load_db_config():
     try:
@@ -90,24 +91,36 @@ def load_data(target_conn, data, table_name, table_info, target):
         print(f"Tabel {target_table} dibuat.")
 
     # Memasukkan data ke tabel
-    if not data.empty:        
-        # Menambahkan kolom `loaded_at` pada DataFrame sebelum dimasukkan ke database
-        data["loaded_at"] = datetime.now()
-        
-        # Melakukan insert data menggunakan pandas
-        data.to_sql(target_table, target_conn, if_exists='append', index=False)
-        print(f"{len(data)} baris data dimasukkan ke tabel {target_table}.")
+    if not data.empty:
+        # Pastikan setiap elemen dari target_conn dikonversi ke string
+        user = target_conn.user.decode() if isinstance(target_conn.user, bytes) else target_conn.user
+        password = target_conn.password.decode() if isinstance(target_conn.password, bytes) else target_conn.password
+        host = target_conn.host.decode() if isinstance(target_conn.host, bytes) else target_conn.host
+        db = target_conn.db.decode() if isinstance(target_conn.db, bytes) else target_conn.db
+
+        # Membangun URL koneksi
+        db_url = f"mysql+pymysql://{user}:{password}@{host}/{db}"
+
+        # Membuat koneksi SQLAlchemy dalam konteks 'with'
+        with create_engine(db_url).connect() as connection:
+            # Menambahkan kolom `loaded_at` pada DataFrame sebelum dimasukkan ke database
+            data["loaded_at"] = pd.to_datetime(datetime.now())
+            
+            # Melakukan insert data menggunakan pandas.to_sql dengan koneksi SQLAlchemy
+            data.to_sql(target_table, connection, if_exists='append', index=False)
+            print(f"{len(data)} baris data dimasukkan ke tabel {target_table}.")
+            
+            connection.commit()
     
     target_conn.commit()
     cursor.close()
-
 
 def etl_process(source, target, time_last_load):
     db_config = load_db_config()
 
     source_conn = create_connection(db_config[source])
     target_conn = create_connection(db_config[target])
-
+    
     if source_conn and target_conn:
         try:
             with source_conn.cursor() as cursor:
@@ -116,9 +129,6 @@ def etl_process(source, target, time_last_load):
 
                 for (table_name,) in tables:
                     extracted_data, table_info = extract_data(source_conn, table_name, time_last_load)
-                    
-                    print("extracted_data", extracted_data)
-                    print("table_info", table_info)
                     
                     if not extracted_data.empty:
                         load_data(target_conn, extracted_data, table_name, table_info, target)
