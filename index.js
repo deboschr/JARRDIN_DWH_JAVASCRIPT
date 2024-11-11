@@ -9,23 +9,21 @@ dotenv.config({ path: "./config/.env" });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Fungsi untuk membuat koneksi default
-function runConnection() {
-	exec("python3 services/connection.py", (error, stdout, stderr) => {
+async function initializeApp() {
+	exec(`python3 services/scheduler.py`, (error, stdout, stderr) => {
 		if (error) {
-			console.error(`Koneksi gagal: ${stderr}`);
+			console.error(`Eksekusi gagal: ${error}`);
 			return;
 		}
 		console.log(stdout);
 	});
+
+	app.use("/", routes);
+
+	const port = 3001;
+	app.listen(port, () => {
+		console.log(`>> Server is running on http://localhost:${port}`);
+	});
 }
 
-// Jalankan koneksi saat server dimulai
-runConnection();
-
-app.use("/", routes);
-
-const port = 3001;
-app.listen(port, () => {
-	console.log(`>> Server is running on http://localhost:${port}`);
-});
+initializeApp();

@@ -15,46 +15,42 @@ class Scheduler {
 
 	// Fungsi untuk menjadwalkan job
 	static async createTask(dataJob) {
-		const rule = new schedule.RecurrenceRule();
-		// Parsing time dari dataJob.time
-		const [hour, minute, second] = dataJob.time.split(":").map(Number);
-		rule.hour = hour;
-		rule.minute = minute;
-		rule.second = second;
+		let rule = new schedule.RecurrenceRule();
 
-		switch (dataJob.period) {
-			case "MINUTE":
-				rule.minute = new schedule.Range(0, 59, dataJob.step);
-				break;
-			case "HOUR":
-				rule.hour = new schedule.Range(0, 23, dataJob.step);
-				break;
-			case "DAY":
-				rule.dayOfWeek = new schedule.Range(0, 6, dataJob.step);
-				break;
-			case "MONTH":
-				rule.month = new schedule.Range(0, 11, dataJob.step);
-				break;
-			case "YEAR":
-				rule.year = new Date().getFullYear() + dataJob.step;
-				break;
-			default:
-				throw new Error("Periode tidak valid");
+		if (dataJob.period !== "MINUTE" && dataJob.period !== "HOUR") {
+			// Parsing time dari dataJob.time
+			const [hour, minute, second] = dataJob.time.split(":").map(Number);
+			rule.hour = hour;
+			rule.minute = minute;
+			rule.second = second;
 		}
+
+		rule = this.timeRule(rule, dataJob.step, dataJob.period, "job");
 
 		// Menjadwalkan job
 		const newJob = schedule.scheduleJob(dataJob.name, rule, async () => {
-			console.log(`Job ${dataJob.name} dijalankan pada:`, new Date());
+			console.log(
+				`>> Job ${dataJob.name} dijalankan pada:`,
+				new Date().toLocaleString()
+			);
 
 			const source = dataJob.config.source;
 			const target = dataJob.config.target;
-			const lastExecuteTime = 0;
+			const lastExecuteTime = this.timeRule(
+				new Date(),
+				dataJob.step,
+				dataJob.period,
+				"date"
+			).toISOString();
+			// .toLocaleString();
+
+			console.log("lastExecuteTime", lastExecuteTime);
 
 			exec(
 				`python3 services/etl.py ${source} ${target} ${lastExecuteTime}`,
 				(error, stdout, stderr) => {
 					if (error) {
-						console.error(`Eksekusi gagal: ${stderr}`);
+						console.error(`Eksekusi gagal: ${error}`);
 						return;
 					}
 					console.log(stdout);
@@ -65,7 +61,7 @@ class Scheduler {
 		// Simpan job ke dalam JOBS
 		this.JOBS[dataJob.name] = newJob;
 
-		if (dataJob.type === "NEW") {
+		if (dataJob.status === "NEW") {
 			// Insert atau update job di database
 			const query = `
 				INSERT INTO job (name, time, step, period, config) 
@@ -89,7 +85,10 @@ class Scheduler {
 				if (err) {
 					console.error("Error saat menyimpan job:", err);
 				} else {
-					console.log(`Job ${dataJob.name} berhasil dijadwalkan dan disimpan.`);
+					console.log(
+						`>> Job ${dataJob.name} berhasil dijadwalkan dan disimpan.`
+					);
+					return results;
 				}
 			});
 		}
@@ -118,7 +117,7 @@ class Scheduler {
 				}
 			});
 		} else {
-			console.log(`Job ${name} tidak ditemukan atau sudah dibatalkan.`);
+			console.log(`>> Job ${name} tidak ditemukan atau sudah dibatalkan.`);
 		}
 	}
 
@@ -140,12 +139,53 @@ class Scheduler {
 					step: dataJob.step,
 					period: dataJob.period,
 					config: JSON.parse(dataJob.config),
-					type: "OLD",
+					status: "OLD",
 				});
 			});
 
-			console.log("Semua job telah dimuat ulang dari database.");
+			console.log(">> Semua job telah dimuat ulang dari database.");
 		});
+	}
+
+	// Fungsi untuk mendapatkan waktu eksekusi terakhir
+	static timeRule(date, step, period, type) {
+		if (type === "date") period = "HOUR";
+
+		const periodActions = {
+			MINUTE: {
+				job: () => (date.minute = new schedule.Range(0, 59, step)),
+				date: () => date.setMinutes(date.getMinutes() - step),
+			},
+			HOUR: {
+				job: () => (date.hour = new schedule.Range(0, 23, step)),
+				date: () => date.setHours(date.getHours() - step),
+			},
+			DAY: {
+				job: () => (date.dayOfWeek = new schedule.Range(0, 6, step)),
+				date: () => date.setDate(date.getDate() - step),
+			},
+			MONTH: {
+				job: () => (date.month = new schedule.Range(0, 11, step)),
+				date: () => date.setMonth(date.getMonth() - step),
+			},
+			YEAR: {
+				job: () => (date.year = new Date().getFullYear() + step),
+				date: () => date.setFullYear(date.getFullYear() - step),
+			},
+		};
+
+		const actionType = type === "job" ? "job" : "date";
+		const periodAction = periodActions[period];
+
+		if (!periodAction) {
+			throw new Error(
+				"Invalid period. Must be 'MINUTE', 'HOUR', 'DAY', 'MONTH', or 'YEAR'."
+			);
+		}
+
+		periodAction[actionType]();
+
+		return date;
 	}
 }
 

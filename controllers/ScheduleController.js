@@ -1,16 +1,16 @@
 const { Scheduler } = require("../utils/Scheduler");
-const { Validator } = require("../utils/validator");
+// const { Validator } = require("../utils/validator");
 
 class ScheduleController {
 	static async getAll(req, res) {
 		try {
-			const { error } = Validator.getAllSchedule(req.query);
+			// const { error } = Validator.getAllSchedule(req.query);
 
-			if (error) {
-				const newError = new Error(error.details[0].message);
-				newError.status = 400;
-				throw newError;
-			}
+			// if (error) {
+			// 	const newError = new Error(error.details[0].message);
+			// 	newError.status = 400;
+			// 	throw newError;
+			// }
 
 			let readSchedule = await Scheduler.readAll(req.query, {
 				EnterpriseID: req.dataLogin.EnterpriseID,
@@ -40,9 +40,8 @@ class ScheduleController {
 
 	static async post(req, res) {
 		try {
-			const dataJob = {};
-
-			const createSchedule = await Scheduler.scheduleTask(req.body);
+			req.body.status = "NEW";
+			const createSchedule = await Scheduler.createTask(req.body);
 
 			res.status(200).json({
 				success: true,
@@ -56,13 +55,13 @@ class ScheduleController {
 
 	static async patch(req, res) {
 		try {
-			let { error } = Validator.updateSchedule(req.body);
+			// let { error } = Validator.updateSchedule(req.body);
 
-			if (error) {
-				const newError = new Error(error.details[0].message);
-				newError.status = 400;
-				throw newError;
-			}
+			// if (error) {
+			// 	const newError = new Error(error.details[0].message);
+			// 	newError.status = 400;
+			// 	throw newError;
+			// }
 
 			const updateSchedule = await Scheduler.update(req.body, {
 				EnterpriseID: req.dataLogin.EnterpriseID,

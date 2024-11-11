@@ -2,6 +2,7 @@ import pymysql
 import json
 import sys
 from connection import create_connection, close_connection
+from datetime import datetime
 
 # Fungsi untuk memuat konfigurasi database
 def load_db_config():
@@ -122,7 +123,7 @@ def load_data(conn, table_name, data, target_type):
         print(f"Error saat memuat data ke {target_type}: {e}")
         conn.rollback()
 
-def main(source, target, time_last_load):
+def etl_process(source, target, time_last_load):
     db_config = load_db_config()
 
     source_conn = create_connection(db_config[source])
@@ -138,28 +139,17 @@ def main(source, target, time_last_load):
                     # Ekstrak data dari database operasional
                     extracted_data = extract_data(source_conn, table_name, time_last_load)
                     
-                    print(extracted_data)
+                    # print(extracted_data)
                     # if extracted_data:
                     #     for table, data in extracted_data.items():
                     #         # Transformasi data jika target adalah data warehouse
                     #         if target == "dwh":
                     #             data = transform_data(data)
-                            
                     #         # Load data ke staging atau data warehouse
                     #         load_data(target_conn, table, data, target)
                 
         except pymysql.MySQLError as e:
             print(f"Error saat proses ETL: {e}")
         finally:
-            close_connection(source)
-            close_connection(target)
-
-if __name__ == "__main__":
-    # Mengambil parameter dari command line
-    if len(sys.argv) > 3:
-        source = sys.argv[1]
-        target = sys.argv[2]
-        time_last_load = int(sys.argv[3])
-        main(source, target, time_last_load)
-    else:
-        print("Parameter tidak lengkap!")
+            close_connection(db_config[source]["dbName"])
+            close_connection(db_config[target]["dbName"])
