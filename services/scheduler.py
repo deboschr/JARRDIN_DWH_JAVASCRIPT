@@ -20,10 +20,10 @@ def load_db_config():
 def create_job(data_job, dwh_conn):
    
    # Parse time input to extract hour, minute, and second
-   time_parts = data_job["time"].split(":")
-   hour = int(time_parts[0])
-   minute = int(time_parts[1])
-   second = int(time_parts[2])
+   total_seconds = int(data_job["time"].total_seconds())
+   hour = total_seconds // 3600
+   minute = (total_seconds % 3600) // 60
+   second = total_seconds % 60
 
    # Create a CronTrigger based on the period
    if data_job["period"] == 'MINUTE':
