@@ -82,16 +82,16 @@ class Scheduler {
 				});
 
 				// Update last_execute di database setelah job dijalankan
-				// const updateQuery = `UPDATE job SET last_execute = ? WHERE name = ?`;
-				// const updateValues = [new Date(), dataJob.name];
+				const updateQuery = `UPDATE job SET last_execute = ? WHERE name = ?`;
+				const updateValues = [new Date(), dataJob.name];
 
-				// connection.execute(updateQuery, updateValues, (err, results) => {
-				// 	if (err) {
-				// 		console.error("Error saat update job:", err);
-				// 	} else {
-				// 		console.log(`>> Job ${dataJob.name} berhasil diupdate.`);
-				// 	}
-				// });
+				connection.execute(updateQuery, updateValues, (err, results) => {
+					if (err) {
+						console.error("Error saat update job:", err);
+					} else {
+						console.log(`>> Job ${dataJob.name} berhasil diupdate.`);
+					}
+				});
 			});
 		});
 
