@@ -7,13 +7,33 @@ from dateutil import parser
 import pandas as pd
 from sqlalchemy import create_engine
 
-def load_db_config():
-    try:
-        with open('config/database.json', 'r') as f:
-            return json.load(f)
-    except FileNotFoundError:
-        print("Configuration file not found.")
-        sys.exit(1)
+# Variabel global untuk konfigurasi database
+DB_CONFIG = {
+    "dwh": {
+        "host": "jadiin-developer.com",
+        "dbName": "jadiinde_jarrdin_dwh",
+        "username": "jadiinde_jarrdin_dwh",
+        "password": "XV6HFaZvU5FNuJ9EVdLX"
+    },
+    "stg": {
+        "host": "jadiin-developer.com",
+        "dbName": "jadiinde_jarrdin_stg",
+        "username": "jadiinde_jarrdin_stg",
+        "password": "3UBETVp9Se8VsKVUBeJy"
+    },
+    "opt1": {
+        "host": "jadiin-developer.com",
+        "dbName": "jadiinde_jarrdin_opt1",
+        "username": "jadiinde_jarrdin_opt1",
+        "password": "76a4ELsFxPkRhhaUeJEX"
+    },
+    "opt2": {
+        "host": "jadiin-developer.com",
+        "dbName": "jadiinde_jarrdin_opt2",
+        "username": "jadiinde_jarrdin_opt2",
+        "password": "BvcWSJg7v3ew6umLUGkC"
+    }
+}
 
 def extract_data(source_conn, table_name, time_last_load, batch_size=500):
     try:
@@ -119,10 +139,9 @@ def load_data(destination_conn, data, table_name, table_info, destination):
     cursor.close()
 
 def etl_process(source, destination, time_last_load):
-    db_config = load_db_config()
 
-    source_conn = create_connection(db_config[source])
-    destination_conn = create_connection(db_config[destination])
+    source_conn = create_connection(DB_CONFIG[source])
+    destination_conn = create_connection(DB_CONFIG[destination])
     
     if source_conn and destination_conn:
         try:
@@ -141,8 +160,8 @@ def etl_process(source, destination, time_last_load):
         except pymysql.MySQLError as e:
             print(f"Error during ETL process: {e}")
         finally:
-            close_connection(db_config[source]["dbName"])
-            close_connection(db_config[destination]["dbName"])
+            close_connection(DB_CONFIG[source]["dbName"])
+            close_connection(DB_CONFIG[destination]["dbName"])
 
 
 if __name__ == "__main__":
@@ -152,8 +171,7 @@ if __name__ == "__main__":
 
     job_name = sys.argv[1]
     
-    db_config = load_db_config()
-    dwh_conn = create_connection(db_config["dwh"])
+    dwh_conn = create_connection(DB_CONFIG["dwh"])
     
     if dwh_conn:
         try:
@@ -177,4 +195,4 @@ if __name__ == "__main__":
         except pymysql.MySQLError as e:
             print(f"Error during get job: {e}")
         finally:
-            close_connection(db_config["dwh"]["dbName"])
+            close_connection(DB_CONFIG["dwh"]["dbName"])
