@@ -23,7 +23,7 @@ class JobController {
 				throw newError;
 			}
 
-			const createJob = await JobService.create(req.body, req.dataUser);
+			const createJob = await JobService.create(req.body, req.dataSession);
 
 			res.status(200).json({ success: true });
 		} catch (error) {

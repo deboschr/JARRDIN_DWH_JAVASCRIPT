@@ -1,5 +1,11 @@
 const { JobModel } = require("../models/JobModel");
 const { Scheduler } = require("../utils/Scheduler");
+const {
+	DatabaseManager,
+	Sequelize,
+	Op,
+} = require("../config/DatabaseManager.js");
+const DataWarehouseDB = DatabaseManager.getDatabase();
 
 class JobService {
 	static async read(isReload = false) {
@@ -15,17 +21,30 @@ class JobService {
 					Scheduler.createTask(job);
 				});
 			} else if (!isReload) {
-				return findJob;
+				const formattedResult = findJob.map((item) => ({
+					job_id: item.job_id,
+					name: item.name,
+					time: item.time,
+					step: item.step,
+					period: item.period,
+					last_execute: item.last_execute,
+					source_name: item.source_name,
+					source_tables: JSON.parse(item.source_tables),
+					destination_name: item.destination_name,
+					destination_tables: JSON.parse(item.destination_tables),
+				}));
+
+				return formattedResult;
 			}
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	static async create(dataJob, dataUser) {
+	static async create(dataJob, dataSession) {
 		let transaction;
 		try {
-			transaction = await SparkDB.transaction();
+			transaction = await DataWarehouseDB.transaction();
 
 			const createJob = await JobModel.create(
 				{
@@ -38,7 +57,7 @@ class JobService {
 					source_tables: dataJob.source_tables,
 					destination_name: dataJob.destination_name,
 					destination_tables: dataJob.destination_tables,
-					created_by: dataUser.user_id,
+					created_by: dataSession.user_id,
 				},
 				{ transaction }
 			);
@@ -65,7 +84,7 @@ class JobService {
 	static async delete(jobId) {
 		let transaction;
 		try {
-			transaction = await SparkDB.transaction();
+			transaction = await DataWarehouseDB.transaction();
 
 			const findJob = await JobModel.finOne({
 				where: { job_id: jobId },

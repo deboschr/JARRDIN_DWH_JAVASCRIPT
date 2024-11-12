@@ -23,18 +23,10 @@ class Authorization {
 			const token = req.headers["token"];
 
 			if (!token) {
-				return res
-					.status(401)
-					.json({ message: "Unauthorized", header: req.headers });
+				return res.status(401).json({ message: "Unauthorized" });
 			}
 
-			console.log(token);
-
-			const secretKey = process.env.SECRET_KEY;
-
-			const decoded = jwt.verify(token, secretKey);
-
-			req.dataLogin = decoded;
+			req.dataSession = jwt.verify(token, process.env.SECRET_KEY);
 
 			next();
 		} catch (error) {

@@ -1,5 +1,11 @@
 const { UserModel } = require("../models/UserModel");
-const { Scheduler } = require("../utils/Scheduler");
+
+const {
+	DatabaseManager,
+	Sequelize,
+	Op,
+} = require("../config/DatabaseManager.js");
+const DataWarehouseDB = DatabaseManager.getDatabase();
 
 class UserService {
 	static async readAll() {
@@ -21,28 +27,10 @@ class UserService {
 			const findUser = await UserModel.findOne({
 				where: { username: username },
 				raw: true,
+				attributes: ["user_id", "username", "password"],
 			});
 
 			return findUser;
-		} catch (error) {
-			throw error;
-		}
-	}
-	static async readAll(isReload = false) {
-		try {
-			const findUser = await UserModel.findAll({
-				order: [["name", "ASC"]],
-				raw: true,
-			});
-
-			// Menjadwal ulang semua User jika reload = true
-			if (isReload && findUser.length > 0) {
-				findUser.forEach((User) => {
-					Scheduler.createTask(User);
-				});
-			} else if (!isReload) {
-				return findUser;
-			}
 		} catch (error) {
 			throw error;
 		}
@@ -51,7 +39,7 @@ class UserService {
 	static async create(dataUser) {
 		let transaction;
 		try {
-			transaction = await SparkDB.transaction();
+			transaction = await DataWarehouseDB.transaction();
 
 			const createUser = await UserModel.create(
 				{
@@ -80,7 +68,7 @@ class UserService {
 	static async delete(userId) {
 		let transaction;
 		try {
-			transaction = await SparkDB.transaction();
+			transaction = await DataWarehouseDB.transaction();
 
 			const findUser = await UserModel.finOne({
 				where: { user_id: userId },

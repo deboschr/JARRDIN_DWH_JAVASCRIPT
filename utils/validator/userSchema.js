@@ -6,7 +6,6 @@ const userSchema = {
 			username: Joi.string()
 				.max(200)
 				.trim()
-				.email({ tlds: { allow: false } }) // validasi format email tanpa batasan TLD
 				.pattern(/^\S+$/) // memastikan tidak ada spasi di username
 				.required(),
 			password: Joi.string()

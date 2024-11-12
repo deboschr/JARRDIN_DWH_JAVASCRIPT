@@ -2,6 +2,7 @@ const { UserService } = require("../services/UserService");
 const { Validator } = require("../utils/validator");
 const { PasswordManager } = require("../utils/PasswordManager");
 const { Authorization } = require("../utils/Authorization");
+
 class UserController {
 	static async get(req, res) {
 		try {
@@ -43,7 +44,7 @@ class UserController {
 				throw newError;
 			}
 
-			const token = await Authorization.encryption(req.body);
+			const token = await Authorization.encryption(findUser);
 
 			res.set("Token", `Bearer ${token}`);
 
@@ -73,7 +74,7 @@ class UserController {
 			}
 
 			const hashedPassword = await PasswordManager.encryption(
-				Pengguna.Password
+				req.body.password
 			);
 
 			req.body.password = hashedPassword;
