@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 async function initializeApp() {
-	await Scheduler.loadJobsFromDB();
+	// await Scheduler.loadJobsFromDB();
 
 	app.use("/", routes);
 

@@ -2,13 +2,12 @@ const schedule = require("node-schedule");
 const { spawn } = require("child_process");
 const mysql = require("mysql2");
 
-const dbConfig = {
+const connection = mysql.createConnection({
 	host: "jadiin-developer.com",
 	user: "jadiinde_jarrdin_dwh",
 	password: "XV6HFaZvU5FNuJ9EVdLX",
 	database: "jadiinde_jarrdin_dwh",
-};
-const connection = mysql.createConnection(dbConfig);
+});
 
 class Scheduler {
 	static JOBS = {};
