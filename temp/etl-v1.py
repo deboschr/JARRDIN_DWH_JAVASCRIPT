@@ -138,37 +138,17 @@ def etl_process(source, target, time_last_load):
             close_connection(db_config[source]["dbName"])
             close_connection(db_config[target]["dbName"])
 
-
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python etl.py <job_name>")
+    if len(sys.argv) != 4:
+        print("Usage: python etl.py <source> <target> <time_last_load>")
         sys.exit(1)
 
-    job_name = sys.argv[1]
-    
-    db_config = load_db_config()
-    dwh_conn = create_connection(db_config["dwh"])
-    
-    if dwh_conn:
-        try:
-            query = "SELECT * FROM job WHERE name = %s"
-            dfJob = pd.read_sql(query, dwh_conn, params=[job_name])
-            
-            if dfJob.empty:
-                print(f"Job with name {job_name} not found.")
-            else:
-                config = json.loads(dfJob["config"].iloc[0])
-                source = config.get("source")
-                target = config.get("target")
-                time_last_load = dfJob["last_execute"].iloc[0]
-                
-                print("source =>", source)
-                print("target =>", target)
-                print("time_last_load =>", time_last_load)
-                
-                etl_process(source, target, time_last_load)
+    source = sys.argv[1]
+    target = sys.argv[2]
+    try:
+        time_last_load = parser.parse(sys.argv[3])
+    except ValueError:
+        print("Invalid date format for time_last_load.")
+        sys.exit(1)
 
-        except pymysql.MySQLError as e:
-            print(f"Error during get job: {e}")
-        finally:
-            close_connection(db_config["dwh"]["dbName"])
+    etl_process(source, target, time_last_load)

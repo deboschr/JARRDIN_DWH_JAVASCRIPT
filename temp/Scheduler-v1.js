@@ -34,6 +34,9 @@ class Scheduler {
 				new Date().toLocaleString()
 			);
 
+			const source = dataJob.config.source;
+			const target = dataJob.config.target;
+
 			// Ambil nilai last_execute terbaru dari database sebelum menjalankan ETL
 			const query = `SELECT name FROM job WHERE name = ?`;
 			connection.execute(query, [dataJob.name], (err, results) => {
@@ -42,17 +45,24 @@ class Scheduler {
 					return;
 				}
 
-				// Pastikan ada hasil dan mengambil name
-				const jobName = results[0]?.name;
-				if (!jobName) {
+				// Pastikan ada hasil dan mengambil last_execute
+				const lastExecuteTime = results[0]?.last_execute;
+				if (!lastExecuteTime) {
 					console.error(
-						`Tidak ditemukan job bernama ${dataJob.name} di database`
+						`Tidak ditemukan last_execute untuk job ${dataJob.name}`
 					);
 					return;
 				}
+				// Ubah lastExecuteTime menjadi format ISO string jika diperlukan
+				const lastExecuteISO = new Date(lastExecuteTime).toISOString();
 
 				// Jalankan proses ETL dengan last_execute terbaru
-				const pythonProcess = spawn("python3", ["services/etl.py", jobName]);
+				const pythonProcess = spawn("python3", [
+					"services/etl.py",
+					source,
+					target,
+					lastExecuteISO,
+				]);
 
 				pythonProcess.stdout.on("data", (data) => {
 					console.log(`stdout: ${data}`);
@@ -67,21 +77,20 @@ class Scheduler {
 				});
 
 				pythonProcess.on("close", (code) => {
-					if (code === 0) {
-						// Hanya perbarui last_execute jika proses ETL berhasil
-						const updateQuery = `UPDATE job SET last_execute = ? WHERE name = ?`;
-						const updateValues = [new Date(), dataJob.name];
-
-						connection.execute(updateQuery, updateValues, (err, results) => {
-							if (err) {
-								console.error("Error saat update job:", err);
-							} else {
-								console.log(`>> Job ${dataJob.name} berhasil diupdate.`);
-							}
-						});
-					}
 					console.log(`ETL process exited with code: ${code}`);
 				});
+
+				// Update last_execute di database setelah job dijalankan
+				// const updateQuery = `UPDATE job SET last_execute = ? WHERE name = ?`;
+				// const updateValues = [new Date(), dataJob.name];
+
+				// connection.execute(updateQuery, updateValues, (err, results) => {
+				// 	if (err) {
+				// 		console.error("Error saat update job:", err);
+				// 	} else {
+				// 		console.log(`>> Job ${dataJob.name} berhasil diupdate.`);
+				// 	}
+				// });
 			});
 		});
 
