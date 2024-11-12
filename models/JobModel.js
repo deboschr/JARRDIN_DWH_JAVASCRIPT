@@ -23,7 +23,7 @@ const JobModel = DataWarehouseDB.define(
 			allowNull: false,
 		},
 		period: {
-			type: DataTypes.TEXT,
+			type: DataTypes.ENUM("MINUTE", "HOUR", "DAY", "MONTH", "YEAR"),
 			allowNull: false,
 		},
 		last_execute: {
