@@ -60,17 +60,20 @@ def extract_data(source_conn, table_name, time_last_load, batch_size=500):
         print(f"Error saat mengekstrak data: {e}")
         return pd.DataFrame(), None
 
-def load_data(target_conn, data, table_name, table_info, target):
-    cursor = target_conn.cursor()
-    target_table = f"stg_{table_name}" if target == "stg" else table_name
+def transform_data():
+    return None
+
+def load_data(destination_conn, data, table_name, table_info, destination):
+    cursor = destination_conn.cursor()
+    destination_table = f"stg_{table_name}" if destination == "stg" else table_name
 
     # Memeriksa apakah tabel stg ada
-    cursor.execute(f"SHOW TABLES LIKE '{target_table}'")
+    cursor.execute(f"SHOW TABLES LIKE '{destination_table}'")
     table_exists = cursor.fetchone() is not None
 
-    if not table_exists and target == "stg":
+    if not table_exists and destination == "stg":
         # Membuat tabel staging baru dengan nama "stg" + nama tabel asli
-        create_table_query = f"CREATE TABLE {target_table} ("
+        create_table_query = f"CREATE TABLE {destination_table} ("
         column_definitions = []
         
         for column in table_info["columns"]:
@@ -88,15 +91,15 @@ def load_data(target_conn, data, table_name, table_info, target):
         create_table_query += ", ".join(column_definitions) + f", PRIMARY KEY ({primary_key_definition}))"
         
         cursor.execute(create_table_query)
-        print(f"Tabel {target_table} dibuat.")
+        print(f"Tabel {destination_table} dibuat.")
 
     # Memasukkan data ke tabel
     if not data.empty:
-        # Pastikan setiap elemen dari target_conn dikonversi ke string
-        user = target_conn.user.decode() if isinstance(target_conn.user, bytes) else target_conn.user
-        password = target_conn.password.decode() if isinstance(target_conn.password, bytes) else target_conn.password
-        host = target_conn.host.decode() if isinstance(target_conn.host, bytes) else target_conn.host
-        db = target_conn.db.decode() if isinstance(target_conn.db, bytes) else target_conn.db
+        # Pastikan setiap elemen dari destination_conn dikonversi ke string
+        user = destination_conn.user.decode() if isinstance(destination_conn.user, bytes) else destination_conn.user
+        password = destination_conn.password.decode() if isinstance(destination_conn.password, bytes) else destination_conn.password
+        host = destination_conn.host.decode() if isinstance(destination_conn.host, bytes) else destination_conn.host
+        db = destination_conn.db.decode() if isinstance(destination_conn.db, bytes) else destination_conn.db
 
         # Membangun URL koneksi
         db_url = f"mysql+pymysql://{user}:{password}@{host}/{db}"
@@ -107,21 +110,21 @@ def load_data(target_conn, data, table_name, table_info, target):
             data["loaded_at"] = pd.to_datetime(datetime.now())
             
             # Melakukan insert data menggunakan pandas.to_sql dengan koneksi SQLAlchemy
-            data.to_sql(target_table, connection, if_exists='append', index=False)
-            print(f"{len(data)} baris data dimasukkan ke tabel {target_table}.")
+            data.to_sql(destination_table, connection, if_exists='append', index=False)
+            print(f"{len(data)} baris data dimasukkan ke tabel {destination_table}.")
             
             connection.commit()
     
-    target_conn.commit()
+    destination_conn.commit()
     cursor.close()
 
-def etl_process(source, target, time_last_load):
+def etl_process(source, destination, time_last_load):
     db_config = load_db_config()
 
     source_conn = create_connection(db_config[source])
-    target_conn = create_connection(db_config[target])
+    destination_conn = create_connection(db_config[destination])
     
-    if source_conn and target_conn:
+    if source_conn and destination_conn:
         try:
             with source_conn.cursor() as cursor:
                 cursor.execute("SHOW TABLES")
@@ -130,13 +133,16 @@ def etl_process(source, target, time_last_load):
                 for (table_name,) in tables:
                     extracted_data, table_info = extract_data(source_conn, table_name, time_last_load)
                     
+                    if destination == "dwh":
+                        extracted_data = transform_data()
+                    
                     if not extracted_data.empty:
-                        load_data(target_conn, extracted_data, table_name, table_info, target)
+                        load_data(destination_conn, extracted_data, table_name, table_info, destination)
         except pymysql.MySQLError as e:
             print(f"Error during ETL process: {e}")
         finally:
             close_connection(db_config[source]["dbName"])
-            close_connection(db_config[target]["dbName"])
+            close_connection(db_config[destination]["dbName"])
 
 
 if __name__ == "__main__":
@@ -159,14 +165,14 @@ if __name__ == "__main__":
             else:
                 config = json.loads(dfJob["config"].iloc[0])
                 source = config.get("source")
-                target = config.get("target")
+                destination = config.get("destination")
                 time_last_load = dfJob["last_execute"].iloc[0]
                 
                 print("source =>", source)
-                print("target =>", target)
+                print("destination =>", destination)
                 print("time_last_load =>", time_last_load)
                 
-                etl_process(source, target, time_last_load)
+                etl_process(source, destination, time_last_load)
 
         except pymysql.MySQLError as e:
             print(f"Error during get job: {e}")
