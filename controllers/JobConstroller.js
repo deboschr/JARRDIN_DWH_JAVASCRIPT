@@ -1,5 +1,5 @@
 const { JobService } = require("../services/JobService");
-// const { Validator } = require("../utils/validator");
+const { Validator } = require("../utils/validator");
 
 class JobController {
 	static async get(req, res) {
@@ -15,6 +15,14 @@ class JobController {
 
 	static async post(req, res) {
 		try {
+			let { error } = Validator.createJob(req.body);
+
+			if (error) {
+				const newError = new Error(error.details[0].message);
+				newError.status = 400;
+				throw newError;
+			}
+
 			const createJob = await JobService.create(req.body, req.dataUser);
 
 			res.status(200).json({ success: true });
