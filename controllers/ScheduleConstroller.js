@@ -1,4 +1,4 @@
-const { Scheduler } = require("../utils/Scheduler");
+const { Scheduler } = require("../services/ScheduleService");
 // const { Validator } = require("../utils/validator");
 
 class ScheduleController {

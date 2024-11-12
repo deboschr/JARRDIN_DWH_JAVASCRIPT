@@ -1,7 +1,7 @@
 import pymysql
 import json
 import sys
-from connection import create_connection, close_connection
+from utils.connection import create_connection, close_connection
 from datetime import datetime
 from dateutil import parser
 import pandas as pd

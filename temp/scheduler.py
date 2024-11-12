@@ -1,5 +1,5 @@
-from connection import create_connection, close_connection
-from etl import etl_process 
+from utils.connection import create_connection, close_connection
+from utils.etl import etl_process 
 
 import json
 import pymysql

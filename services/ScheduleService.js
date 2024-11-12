@@ -9,7 +9,7 @@ const connection = mysql.createConnection({
 	database: "jadiinde_jarrdin_dwh",
 });
 
-class Scheduler {
+class SchedulerService {
 	static JOBS = {};
 
 	// Fungsi untuk menjadwalkan job
@@ -253,4 +253,4 @@ class Scheduler {
 	}
 }
 
-module.exports = { Scheduler };
+module.exports = { SchedulerService };
