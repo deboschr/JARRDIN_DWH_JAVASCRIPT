@@ -86,7 +86,7 @@ class JobService {
 		try {
 			transaction = await DataWarehouseDB.transaction();
 
-			const findJob = await JobModel.finOne({
+			const findJob = await JobModel.findOne({
 				where: { job_id: jobId },
 			});
 
