@@ -9,9 +9,7 @@ router.get("/", (req, res) => {
 
 // Schedule
 router.get("/schedule", ScheduleController.getAll);
-router.get("/schedule/:id", ScheduleController.getOne);
 router.post("/schedule", ScheduleController.post);
-router.patch("/schedule", ScheduleController.patch);
 router.delete("/schedule/:id", ScheduleController.delete);
 
 module.exports = router;

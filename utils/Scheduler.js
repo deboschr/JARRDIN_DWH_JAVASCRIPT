@@ -91,14 +91,14 @@ class Scheduler {
 		if (dataJob.status === "NEW") {
 			// Insert atau update job di database
 			const query = `
-      		INSERT INTO job (name, time, step, period, config, last_execute) 
+      		INSERT INTO job (name, time, step, period, last_execute, config) 
       		VALUES (?, ?, ?, ?, ?, ?) 
       		ON DUPLICATE KEY UPDATE 
         			time = VALUES(time), 
         			step = VALUES(step), 
         			period = VALUES(period), 
-        			config = VALUES(config),
-        			last_execute = VALUES(last_execute)
+        			last_execute = VALUES(last_execute),
+        			config = VALUES(config)
     			`;
 
 			const values = [
@@ -106,8 +106,8 @@ class Scheduler {
 				dataJob.time,
 				dataJob.step,
 				dataJob.period,
+				dataJob.last_execute,
 				JSON.stringify(dataJob.config),
-				new Date(),
 			];
 
 			connection.execute(query, values, (err, results) => {
@@ -122,31 +122,52 @@ class Scheduler {
 		}
 	}
 
-	// Fungsi untuk membatalkan job berdasarkan nama
-	static async cancelTask(name) {
-		const job = this.JOBS[name];
-
-		if (job) {
-			// Hentikan job
-			job.cancel();
-
-			// Hapus job dari JOBS
-			delete this.JOBS[name];
-
-			// Hapus job dari database
-			const query = `DELETE FROM job WHERE name = ?`;
-			connection.execute(query, [name], (err, results) => {
+	// Method untuk membatalkan dan menghapus task berdasarkan jobId
+	static async cancelTask(jobId) {
+		return new Promise((resolve, reject) => {
+			// Pertama, ambil jobName berdasarkan jobId
+			const selectQuery = `SELECT name FROM job WHERE job_id = ?`;
+			connection.execute(selectQuery, [jobId], (err, results) => {
 				if (err) {
-					console.error("Error saat menghapus job:", err);
-				} else {
-					console.log(
-						`Job ${name} telah dibatalkan dan dihapus dari database.`
-					);
+					console.error("Error saat mengambil job:", err);
+					return reject(err);
 				}
+
+				if (results.length === 0) {
+					console.log(`Job dengan ID ${jobId} tidak ditemukan.`);
+					return resolve(`Job dengan ID ${jobId} tidak ditemukan.`);
+				}
+
+				const jobName = results[0].name; // Ambil jobName dari hasil query
+
+				// Setelah mendapatkan jobName, lanjutkan dengan menghapus job dari database
+				const deleteQuery = `DELETE FROM job WHERE job_id = ?`;
+				connection.execute(deleteQuery, [jobId], (deleteErr, deleteResults) => {
+					if (deleteErr) {
+						console.error("Error saat menghapus job:", deleteErr);
+						return reject(deleteErr);
+					}
+
+					// Hentikan dan hapus job dari instance JOBS
+					const job = this.JOBS[jobName];
+					if (job) {
+						job.cancel();
+						delete this.JOBS[jobName];
+						console.log(
+							`Job ${jobName} telah dibatalkan dan dihapus dari database.`
+						);
+						resolve(
+							`Job ${jobName} telah dibatalkan dan dihapus dari database.`
+						);
+					} else {
+						console.log(`Job ${jobName} tidak ditemukan di instance JOBS.`);
+						resolve(
+							`Job ${jobName} tidak ditemukan di instance JOBS, tetapi sudah dihapus dari database.`
+						);
+					}
+				});
 			});
-		} else {
-			console.log(`>> Job ${name} tidak ditemukan atau sudah dibatalkan.`);
-		}
+		});
 	}
 
 	// Fungsi untuk memuat ulang job dari database saat server mulai
@@ -201,6 +222,35 @@ class Scheduler {
 		}
 
 		return rule;
+	}
+
+	static readAll() {
+		return new Promise((resolve, reject) => {
+			const query = `SELECT * FROM job`;
+
+			connection.execute(query, (err, job) => {
+				if (err) {
+					console.error("Error saat memuat ulang job:", err);
+					return reject(err);
+				}
+
+				const results = [];
+				// Menjadwalkan ulang semua job berdasarkan data yang diambil dari database
+				job.forEach((item) => {
+					results.push({
+						job_id: item.job_id,
+						name: item.name,
+						time: item.time,
+						step: item.step,
+						period: item.period,
+						last_execute: item.last_execute,
+						config: JSON.parse(item.config),
+					});
+				});
+
+				resolve(results);
+			});
+		});
 	}
 }
 

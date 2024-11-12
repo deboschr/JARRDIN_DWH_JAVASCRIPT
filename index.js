@@ -12,7 +12,6 @@ app.use(express.urlencoded({ extended: true }));
 async function initializeApp() {
 	await Scheduler.loadJobsFromDB();
 
-	// Melanjutkan dengan inisialisasi server Express
 	app.use("/", routes);
 
 	const port = 3001;

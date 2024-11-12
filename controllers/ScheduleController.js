@@ -4,32 +4,7 @@ const { Scheduler } = require("../utils/Scheduler");
 class ScheduleController {
 	static async getAll(req, res) {
 		try {
-			// const { error } = Validator.getAllSchedule(req.query);
-
-			// if (error) {
-			// 	const newError = new Error(error.details[0].message);
-			// 	newError.status = 400;
-			// 	throw newError;
-			// }
-
-			let readSchedule = await Scheduler.readAll(req.query, {
-				EnterpriseID: req.dataLogin.EnterpriseID,
-				OutletID: req.dataSession.OutletID,
-			});
-
-			res.status(200).json(readSchedule);
-		} catch (error) {
-			console.error(error);
-			res.status(error.status || 500).json({ error: error.message });
-		}
-	}
-
-	static async getOne(req, res) {
-		try {
-			let readSchedule = await Scheduler.readOne(req.params.id, {
-				EnterpriseID: req.dataLogin.EnterpriseID,
-				OutletID: req.dataSession.OutletID,
-			});
+			let readSchedule = await Scheduler.readAll();
 
 			res.status(200).json(readSchedule);
 		} catch (error) {
@@ -40,8 +15,17 @@ class ScheduleController {
 
 	static async post(req, res) {
 		try {
-			req.body.status = "NEW";
-			const createSchedule = await Scheduler.createTask(req.body);
+			const dataJob = {
+				name: req.body.name,
+				time: req.body.time,
+				step: req.body.step,
+				period: req.body.period,
+				last_execute: new Date(req.body.startDate),
+				config: req.body.config,
+				status: "NEW",
+			};
+
+			const createSchedule = await Scheduler.createTask(dataJob);
 
 			res.status(200).json({
 				success: true,
@@ -53,40 +37,11 @@ class ScheduleController {
 		}
 	}
 
-	static async patch(req, res) {
-		try {
-			// let { error } = Validator.updateSchedule(req.body);
-
-			// if (error) {
-			// 	const newError = new Error(error.details[0].message);
-			// 	newError.status = 400;
-			// 	throw newError;
-			// }
-
-			const updateSchedule = await Scheduler.update(req.body, {
-				EnterpriseID: req.dataLogin.EnterpriseID,
-				OutletID: req.dataSession.OutletID,
-				SparkUserID: req.dataLogin.SparkUserID,
-			});
-
-			res.status(200).json({
-				success: true,
-				data: updateSchedule,
-			});
-		} catch (error) {
-			console.error(error);
-			res.status(error.status || 500).json({ error: error.message });
-		}
-	}
-
 	static async delete(req, res) {
 		try {
-			const deleteSchedule = await Scheduler.delete(
-				req.params.id,
-				req.dataLogin.EnterpriseID
-			);
+			const deleteSchedule = await Scheduler.cancelTask(req.params.id);
 
-			res.status(200).json({ success: true });
+			res.status(200).json({ success: true, message: deleteSchedule });
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });
