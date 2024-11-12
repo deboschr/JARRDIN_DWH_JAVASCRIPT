@@ -1,8 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const routes = require("./routes");
 const { DatabaseManager } = require("./config/DatabaseManager.js");
-// const { JobService } = require("./services/JobService.js");
 const app = express();
 
 dotenv.config({ path: "./config/.env" });
@@ -10,13 +8,16 @@ dotenv.config({ path: "./config/.env" });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-new DatabaseManager();
-DatabaseManager.authenticate();
-// DatabaseManager.synchronize((isForce = false));
-
 async function initializeApp() {
+	// Inisialisasi DatabaseManager dan koneksi database
+	new DatabaseManager();
+	await DatabaseManager.authenticate();
+	// DatabaseManager.synchronize((isForce = false));
+
+	const { JobService } = require("./services/JobService.js");
 	// await JobService.read((isReload = true));
 
+	const routes = require("./routes");
 	app.use("/", routes);
 
 	const port = 3001;

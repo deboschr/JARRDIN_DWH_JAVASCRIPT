@@ -14,7 +14,7 @@ class JobService {
 				findJob.forEach((job) => {
 					Scheduler.createTask(job);
 				});
-			} else {
+			} else if (!isReload) {
 				return findJob;
 			}
 		} catch (error) {
