@@ -1,9 +1,9 @@
 import pymysql
 import json
 from connection import create_connection, close_connection
-from extract import extract_data
-from transform import transform_data
-from load import load_data
+from temp.extract import extract_data
+from temp.transform import transform_data
+from temp.load import load_data
 
 # Menyimpan koneksi untuk berbagai database
 CONNECTIONS = {}
