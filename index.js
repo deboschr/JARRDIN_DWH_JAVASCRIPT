@@ -1,7 +1,8 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const routes = require("./routes.js");
-const { Scheduler } = require("./utils/Scheduler.js");
+const { DatabaseManager } = require("./config/DatabaseManager.js");
+const { JobService } = require("./services/JobService.js");
 const app = express();
 
 dotenv.config({ path: "./config/.env" });
@@ -9,8 +10,12 @@ dotenv.config({ path: "./config/.env" });
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+new DatabaseManager();
+DatabaseManager.authenticate();
+// DatabaseManager.synchronize((isForce = false));
+
 async function initializeApp() {
-	// await Scheduler.loadJobsFromDB();
+	await JobService.read((isReload = true));
 
 	app.use("/", routes);
 
