@@ -2,7 +2,33 @@ const { UserModel } = require("../models/UserModel");
 const { Scheduler } = require("../utils/Scheduler");
 
 class UserService {
-	static async read(isReload = false) {
+	static async readAll() {
+		try {
+			const findUser = await UserModel.findAll({
+				order: [["username", "ASC"]],
+				raw: true,
+				attributes: ["username"],
+			});
+
+			return findUser;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	static async readOne(username) {
+		try {
+			const findUser = await UserModel.findOne({
+				where: { username: username },
+				raw: true,
+			});
+
+			return findUser;
+		} catch (error) {
+			throw error;
+		}
+	}
+	static async readAll(isReload = false) {
 		try {
 			const findUser = await UserModel.findAll({
 				order: [["name", "ASC"]],
@@ -22,29 +48,18 @@ class UserService {
 		}
 	}
 
-	static async create(dataUser, dataSession) {
+	static async create(dataUser) {
 		let transaction;
 		try {
 			transaction = await SparkDB.transaction();
 
 			const createUser = await UserModel.create(
 				{
-					name: dataUser.name,
-					time: dataUser.time,
-					step: dataUser.step,
-					period: dataUser.period,
-					last_execute: dataUser.start_date,
-					source_name: dataUser.source_name,
-					source_tables: dataUser.source_tables,
-					destination_name: dataUser.destination_name,
-					destination_tables: dataUser.destination_tables,
-					created_by: dataUser.user_id,
+					username: dataUser.username,
+					password: dataUser.password,
 				},
 				{ transaction }
 			);
-
-			// Menjadwalkan User
-			Scheduler.createTask(createUser);
 
 			await transaction.commit();
 
@@ -62,21 +77,18 @@ class UserService {
 		}
 	}
 
-	static async delete(UserId) {
+	static async delete(userId) {
 		let transaction;
 		try {
 			transaction = await SparkDB.transaction();
 
 			const findUser = await UserModel.finOne({
-				where: { User_id: UserId },
+				where: { user_id: userId },
 			});
 
 			if (!findUser) {
 				throw new Error(`User tidak ditemukan.`);
 			}
-
-			// Menghentikan User dari penjadwalan
-			Scheduler.cancelTask(findUser.name);
 
 			// Menghapus User dari database
 			await findUser.destroy({ transaction });
