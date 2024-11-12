@@ -1,6 +1,6 @@
 const express = require("express");
 const dotenv = require("dotenv");
-const routes = require("./routes.js");
+const routes = require("./routes");
 const { DatabaseManager } = require("./config/DatabaseManager.js");
 const { JobService } = require("./services/JobService.js");
 const app = express();
