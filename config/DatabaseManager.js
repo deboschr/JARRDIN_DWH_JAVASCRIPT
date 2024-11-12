@@ -80,19 +80,19 @@ class DatabaseManager {
 		}
 	}
 
-	static async closeConnection(dbName) {
-		const db = DatabaseManager.CONNECTION[dbName];
+	static async closeConnection() {
+		const db = DatabaseManager.CONNECTION;
 
 		if (!db) {
-			console.error(`>> ${dbName} database is not configured.`);
+			console.error(`>> Database is not configured.`);
 			return;
 		}
 
 		try {
 			await db.close();
-			console.log(`>> Connection to ${dbName} database closed.`);
+			console.log(`>> Connection to database closed.`);
 		} catch (error) {
-			console.error(`Error closing connection to ${dbName} database:`, error);
+			console.error(`Error closing connection to database:`, error);
 		}
 	}
 }

@@ -1,5 +1,5 @@
 const { DatabaseManager, DataTypes } = require("../config/DatabaseManager.js");
-const DataWarehouseDB = DatabaseManager.getDatabase(process.env.DB_NAME);
+const DataWarehouseDB = DatabaseManager.getDatabase();
 
 const JobModel = DataWarehouseDB.define(
 	"job",

@@ -2,7 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const routes = require("./routes");
 const { DatabaseManager } = require("./config/DatabaseManager.js");
-const { JobService } = require("./services/JobService.js");
+// const { JobService } = require("./services/JobService.js");
 const app = express();
 
 dotenv.config({ path: "./config/.env" });
@@ -15,7 +15,7 @@ DatabaseManager.authenticate();
 // DatabaseManager.synchronize((isForce = false));
 
 async function initializeApp() {
-	await JobService.read((isReload = true));
+	// await JobService.read((isReload = true));
 
 	app.use("/", routes);
 

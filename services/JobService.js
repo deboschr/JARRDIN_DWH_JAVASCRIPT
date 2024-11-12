@@ -14,9 +14,9 @@ class JobService {
 				findJob.forEach((job) => {
 					Scheduler.createTask(job);
 				});
+			} else {
+				return findJob;
 			}
-
-			return findJob;
 		} catch (error) {
 			throw error;
 		}
