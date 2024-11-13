@@ -50,24 +50,26 @@ def etl_process(dfJob):
 
                     for (table_name,) in tables:
                         df_extracted, table_info = extract_data(source_conn, table_name, time_last_load)
-
-                        if not df_extracted.empty:
-                            load_data_stg(destination_conn, df_extracted, table_name, table_info)
+                        
+                        load_data_stg(destination_conn, df_extracted, table_name, table_info)
 
             elif destination_name == "dwh":
-                if dfJob["name"].iloc[0] == "RESIDENT":
-                    source_tabel_name = source_tables[0]
-                    df_extracted, table_info = extract_data(source_conn, source_tabel_name, time_last_load)
-                    if not df_extracted.empty:            
-                        df_transformed = transform_data_resident(df_extracted)
-                        destination_tabel_name = destination_tables[0]
-                        duplicate_key = dfJob["duplicate_key"].iloc[0]
-                        load_data_dwh(destination_conn, df_transformed, destination_tabel_name, duplicate_key)
-                else:
-                    # tapi ini error, kenapa?
-                    print(f"ETL for {dfJob['name'].iloc[0]} is not configure.")
                 
-
+                source_tabel_name = source_tables[0]
+                destination_tabel_name = destination_tables[0]
+                duplicate_key = dfJob["duplicate_key"].iloc[0]
+                
+                df_extracted,_ = extract_data(source_conn, source_tabel_name, time_last_load)
+                
+                df_transformed = None
+                if dfJob["name"].iloc[0] == "RESIDENT":
+                    df_transformed = transform_data_resident(df_extracted)
+                else:
+                    print(f"ETL for {dfJob['name'].iloc[0]} is not configure.")
+                    return
+                
+                load_data_dwh(destination_conn, df_transformed, destination_tabel_name, duplicate_key)
+                
         except pymysql.MySQLError as e:
             print(f"Error during ETL process: {e}")
         finally:
