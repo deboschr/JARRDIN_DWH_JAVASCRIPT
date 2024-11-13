@@ -1,4 +1,5 @@
-import pymysql
+from sqlalchemy import create_engine
+from sqlalchemy.exc import SQLAlchemyError
 
 # Menyimpan koneksi untuk berbagai database
 CONNECTIONS = {}
@@ -6,20 +7,20 @@ CONNECTIONS = {}
 # Fungsi untuk membuat koneksi ke database
 def create_connection(dataDb):
     global CONNECTIONS
-    database_name = dataDb['database_name']  # Mengakses database_name dari dictionary
-    if database_name not in CONNECTIONS or not CONNECTIONS[database_name].open:
+    database_name = dataDb['database_name']
+    
+    # Membuat string koneksi dengan SQLAlchemy
+    connection_url = f"mysql+pymysql://{dataDb['username']}:{dataDb['password']}@{dataDb['host']}/{dataDb['database_name']}"
+    
+    if database_name not in CONNECTIONS or CONNECTIONS[database_name] is None:
         try:
-            # Membuat koneksi baru jika belum ada atau jika koneksi sebelumnya sudah tertutup
-            CONNECTIONS[database_name] = pymysql.connect(
-                host=dataDb['host'],
-                user=dataDb['username'],
-                password=dataDb['password'],
-                database=dataDb['database_name']
-            )
+            # Membuat engine baru jika belum ada atau jika koneksi sebelumnya sudah tertutup
+            engine = create_engine(connection_url)
+            CONNECTIONS[database_name] = engine.connect()
             
             print(f">> Koneksi ke {database_name} berhasil!")
             return CONNECTIONS[database_name]
-        except pymysql.MySQLError as e:
+        except SQLAlchemyError as e:
             print(f">> Error saat membuat koneksi ke {database_name}: {e}")
             return None
     else:
@@ -41,7 +42,7 @@ def close_connection(database_name):
             print(f">> Koneksi ke {database_name} ditutup.")
             
             return True
-        except pymysql.MySQLError as e:
+        except SQLAlchemyError as e:
             print(f">> Error saat menutup koneksi ke {database_name}: {e}")
             return False
     else:

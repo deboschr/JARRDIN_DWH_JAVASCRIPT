@@ -3,7 +3,7 @@ import pandas as pd
 def transform_data_resident(dataframe):
    
    if dataframe.empty:
-      return None
+      return dataframe
    
    # Memilih dan merename kolom untuk disesuaikan dengan tabel tujuan
    transformed_df = dataframe.rename(columns={
