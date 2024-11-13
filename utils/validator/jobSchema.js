@@ -12,10 +12,10 @@ const jobSchema = {
 			period: Joi.string()
 				.valid("MINUTE", "HOUR", "DAY", "MONTH", "YEAR")
 				.required(),
-			start_date: Joi.string()
+			last_execute: Joi.string()
 				.isoDate()
 				.message(
-					"Field 'start_date' harus dalam format ISO 8601 (YYYY-MM-DDTHH:MM:SSZ)"
+					"Field 'last_execute' harus dalam format ISO 8601 (YYYY-MM-DDTHH:MM:SSZ)"
 				)
 				.required(),
 			source_name: Joi.string().min(3).max(100).required(),

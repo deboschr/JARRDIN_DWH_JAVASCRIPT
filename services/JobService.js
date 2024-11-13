@@ -28,7 +28,8 @@ class JobService {
 					time: item.time,
 					step: item.step,
 					period: item.period,
-					last_execute: item.last_execute,
+					count: item.count,
+					last_execute: item.updated_at,
 					source_name: item.source_name,
 					source_tables: JSON.parse(item.source_tables),
 					destination_name: item.destination_name,
@@ -53,12 +54,11 @@ class JobService {
 					time: dataJob.time,
 					step: dataJob.step,
 					period: dataJob.period,
-					last_execute: dataJob.start_date,
 					source_name: dataJob.source_name,
 					source_tables: dataJob.source_tables,
 					destination_name: dataJob.destination_name,
 					destination_tables: dataJob.destination_tables,
-					created_by: dataSession.user_id,
+					updated_at: dataJob.last_execute,
 				},
 				{ transaction }
 			);

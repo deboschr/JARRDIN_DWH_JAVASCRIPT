@@ -36,7 +36,7 @@ def etl_process(dfJob):
     source_tables = json.loads(dfJob["source_tables"].iloc[0])
     destination_name = dfJob["destination_name"].iloc[0]
     destination_tables = json.loads(dfJob["destination_tables"].iloc[0])
-    time_last_load = dfJob["last_execute"].iloc[0]
+    time_last_load = dfJob["updated_at"].iloc[0]
     
     source_conn = create_connection(DB_CONFIG[source_name])
     destination_conn = create_connection(DB_CONFIG[destination_name])
@@ -55,13 +55,15 @@ def etl_process(dfJob):
                             load_data(destination_conn, extracted_data, table_name, table_info, destination_name)
 
             elif destination_name == "dwh":
-                
+                # ini bisa print
+                print(dfJob["name"].iloc[0])
                 if dfJob["name"].iloc[0] == "RESIDENT":
-                    extracted_data, table_info = extract_data(source_conn, table_name, time_last_load)
+                    source_tabel_name = source_tables[0]
+                    extracted_data, _ = extract_data(source_conn, source_tabel_name, time_last_load)
                 
                     transformed_data = transform_data_resident(extracted_data)
                     
-                    load_data(destination_conn, transformed_data, table_name, table_info, destination_name)
+                    # load_data(destination_conn, transformed_data, table_name, table_info, destination_name)
                 elif dfJob["name"].iloc[0] == "LOCATION":
                     extracted_data, table_info = extract_data(source_conn, table_name, time_last_load)
                 
@@ -69,7 +71,8 @@ def etl_process(dfJob):
                     
                     load_data(destination_conn, transformed_data, table_name, table_info, destination_name)
                 else:
-                    print(f"ETL for {dfJob["name"].iloc[0]} is not configure.")
+                    # tapi ini error, kenapa?
+                    print(f"ETL for {dfJob['name'].iloc[0]} is not configure.")
                 
 
         except pymysql.MySQLError as e:

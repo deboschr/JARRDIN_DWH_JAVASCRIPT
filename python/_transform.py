@@ -1,4 +1,5 @@
 def transform_data_resident(dataframe):
+   print(dataframe)
    print("transform_data_resident")
    
 def transform_data_location(dataframe):

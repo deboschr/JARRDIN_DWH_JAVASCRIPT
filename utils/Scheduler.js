@@ -74,11 +74,7 @@ class Scheduler {
 
 				pythonProcess.on("close", async (code) => {
 					if (code === 0) {
-						const lastExecute = new Date().toLocaleString();
-						await findJob.update({ last_execute: lastExecute });
-						console.log(
-							`Job ${dataJob.name} berhasil diupdate. last_excute = ${lastExecute}`
-						);
+						await findJob.update({ count: findJob.count + 1 });
 					}
 					console.log(`ETL process exited with code: ${code}`);
 				});
