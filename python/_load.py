@@ -40,34 +40,58 @@ def load_data_stg(stg_conn, data, source_table, table_info):
     print(f"{len(data)} baris data dimasukkan ke tabel {destination_table}.")
 
 
-
 def load_data_dwh(dwh_conn, data, destination_table, duplicate_key):
     if data.empty:
         return
 
-    # Tentukan kolom yang bukan kunci duplikat
+    # Menentukan kolom yang akan diperbarui jika terjadi duplikasi
     non_key_columns = [col for col in data.columns if col not in duplicate_key]
     
-    # Jika non_key_columns kosong, gunakan duplicate_key untuk menjaga sintaks ON DUPLICATE KEY UPDATE
-    if not non_key_columns:
-        # Jika benar-benar tidak ada kolom untuk di-update, gunakan duplicate_key untuk ON DUPLICATE KEY UPDATE
-        update_clause = f"{duplicate_key} = {duplicate_key}"  # Menggunakan kolom pertama di duplicate_key
-    else:
-        update_clause = ', '.join([f"{col} = VALUES({col})" for col in non_key_columns])
-
-    # Membuat query upsert dengan ON DUPLICATE KEY UPDATE
+    # Mengatur query untuk upsert
     insert_query = f"""
     INSERT INTO {destination_table} ({', '.join(data.columns)})
     VALUES ({', '.join([f':{col}' for col in data.columns])})
     ON DUPLICATE KEY UPDATE
-    {update_clause}
+    {', '.join([f"{col} = VALUES({col})" for col in (non_key_columns if non_key_columns else duplicate_key)])}
     """
 
-    # Eksekusi upsert untuk setiap baris data
+    # Melakukan upsert per baris
     for _, row in data.iterrows():
         dwh_conn.execute(text(insert_query), row.to_dict())
-    
+        
     dwh_conn.commit()
 
     print(f"{len(data)} baris data diperbarui atau dimasukkan ke tabel {destination_table}.")
+
+
+
+# def load_data_dwh(dwh_conn, data, destination_table, duplicate_key):
+#     if data.empty:
+#         return
+
+#     # Tentukan kolom yang bukan kunci duplikat
+#     non_key_columns = [col for col in data.columns if col not in duplicate_key]
+    
+#     # Jika non_key_columns kosong, gunakan duplicate_key untuk menjaga sintaks ON DUPLICATE KEY UPDATE
+#     if not non_key_columns:
+#         # Jika benar-benar tidak ada kolom untuk di-update, gunakan duplicate_key untuk ON DUPLICATE KEY UPDATE
+#         update_clause = f"{duplicate_key} = {duplicate_key}"  # Menggunakan kolom pertama di duplicate_key
+#     else:
+#         update_clause = ', '.join([f"{col} = VALUES({col})" for col in non_key_columns])
+
+#     # Membuat query upsert dengan ON DUPLICATE KEY UPDATE
+#     insert_query = f"""
+#     INSERT INTO {destination_table} ({', '.join(data.columns)})
+#     VALUES ({', '.join([f':{col}' for col in data.columns])})
+#     ON DUPLICATE KEY UPDATE
+#     {update_clause}
+#     """
+
+#     # Eksekusi upsert untuk setiap baris data
+#     for _, row in data.iterrows():
+#         dwh_conn.execute(text(insert_query), row.to_dict())
+    
+#     dwh_conn.commit()
+
+#     print(f"{len(data)} baris data diperbarui atau dimasukkan ke tabel {destination_table}.")
 

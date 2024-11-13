@@ -54,7 +54,7 @@ def etl_process(dfJob):
 
                 source_table_name = source_tables[0]
                 destination_table_name = destination_tables[0]
-                duplicate_key = dfJob["duplicate_key"].iloc[0]
+                duplicate_key = json.loads(dfJob["duplicate_key"].iloc[0])
                 
                 df_extracted, _ = extract_data(source_conn, source_table_name, time_last_load, "dwh")
                 

@@ -48,7 +48,7 @@ const JobModel = DataWarehouseDB.define(
 			allowNull: true,
 		},
 		duplicate_key: {
-			type: DataTypes.STRING(100),
+			type: DataTypes.JSON,
 			allowNull: true,
 		},
 		created_at: {
