@@ -62,7 +62,7 @@ def etl_process(dfJob):
                 if dfJob['name'].iloc[0] == "TOWER":
                     df_transformed = transform_data_tower(df_extracted)
                 elif dfJob['name'].iloc[0] == "FLOOR":
-                    df_transformed = transform_data_floor(df_extracted)
+                    df_transformed = transform_data_floor(df_extracted, destination_conn)
                 elif dfJob['name'].iloc[0] == "UNIT":
                     df_transformed = transform_data_unit(df_extracted)
                 elif dfJob['name'].iloc[0] == "RESIDENT":  

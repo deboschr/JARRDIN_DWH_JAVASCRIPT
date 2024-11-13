@@ -23,6 +23,9 @@ def transform_data_resident(df_resident):
 
    
 def transform_data_tower(df_location):
+   if df_location.empty:
+      return df_location
+   
    # Memilih kolom 'tower' dan menghapus duplikat
    df_tower = df_location[['tower']].drop_duplicates().rename(columns={'tower': 'name'})
       
@@ -30,6 +33,9 @@ def transform_data_tower(df_location):
    return df_tower
 
 def transform_data_floor(df_location, dwh_conn):
+   if df_location.empty:
+      return df_location
+   
    # Mengambil data unik tower dan floor dari df_location
    df_floor_temp = df_location[['tower', 'floor']].drop_duplicates().rename(columns={'floor': 'name'})
       
@@ -48,6 +54,9 @@ def transform_data_floor(df_location, dwh_conn):
 
 
 def transform_data_unit(df_location, df_contract, dwh_conn):
+   if df_location.empty or df_contract.empty:
+      return df_location
+   
    # Step 1: Ambil floor_id berdasarkan tower dan floor
    # Query untuk mendapatkan data floor dari dim_floor
    floor_query = text("SELECT floor_id, tower_id, name FROM dim_floor")
