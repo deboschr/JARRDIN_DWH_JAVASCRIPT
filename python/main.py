@@ -64,7 +64,9 @@ def etl_process(dfJob):
                 elif dfJob['name'].iloc[0] == "FLOOR":
                     df_transformed = transform_data_floor(df_extracted, destination_conn)
                 elif dfJob['name'].iloc[0] == "UNIT":
-                    df_transformed = transform_data_unit(df_extracted)
+                    source_table_name2 = source_tables[1]
+                    df_extracted2, _ = extract_data(source_conn, source_table_name2, time_last_load, "dwh")
+                    df_transformed = transform_data_unit(df_extracted, df_extracted2, destination_conn)
                 elif dfJob['name'].iloc[0] == "RESIDENT":  
                     df_transformed = transform_data_resident(df_extracted)
                 else:
