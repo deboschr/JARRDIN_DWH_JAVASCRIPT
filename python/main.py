@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy import text
 from connection import create_connection, close_connection
 from _extract import extract_data
-from _transform import transform_data_resident, transform_data_location
+from _transform import transform_data_resident, transform_data_tower, transform_data_floor, transform_data_unit
 from _load import load_data_stg, load_data_dwh
 
 # Variabel global untuk konfigurasi database
@@ -51,6 +51,7 @@ def etl_process(dfJob):
                     load_data_stg(destination_conn, df_extracted, table_name, table_info)
 
             elif destination_name == "dwh":
+
                 source_table_name = source_tables[0]
                 destination_table_name = destination_tables[0]
                 duplicate_key = dfJob["duplicate_key"].iloc[0]
@@ -58,13 +59,20 @@ def etl_process(dfJob):
                 df_extracted, _ = extract_data(source_conn, source_table_name, time_last_load, "dwh")
                 
                 df_transformed = pd.DataFrame()
-                if dfJob["name"].iloc[0] == "RESIDENT":
+                if dfJob['name'].iloc[0] == "TOWER":
+                    df_transformed = transform_data_tower(df_extracted)
+                elif dfJob['name'].iloc[0] == "FLOOR":
+                    df_transformed = transform_data_floor(df_extracted)
+                elif dfJob['name'].iloc[0] == "UNIT":
+                    df_transformed = transform_data_unit(df_extracted)
+                elif dfJob['name'].iloc[0] == "RESIDENT":  
                     df_transformed = transform_data_resident(df_extracted)
                 else:
                     print(f"ETL for {dfJob['name'].iloc[0]} is not configured.")
                     return
                 
                 load_data_dwh(destination_conn, df_transformed, destination_table_name, duplicate_key)
+                
                 
         except Exception as e:
             print(f"Error during ETL process: {e}")
