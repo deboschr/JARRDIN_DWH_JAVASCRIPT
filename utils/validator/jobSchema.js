@@ -36,6 +36,11 @@ const jobSchema = {
 					then: Joi.required(),
 					otherwise: Joi.forbidden(),
 				}),
+			duplicate_key: Joi.string().min(2).max(100).when("destination_name", {
+				is: "dwh",
+				then: Joi.required(),
+				otherwise: Joi.forbidden(),
+			}),
 		}).required();
 
 		return schema.validate(job);

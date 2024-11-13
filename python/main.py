@@ -47,7 +47,7 @@ def etl_process(dfJob):
                 tables = source_conn.execute(tables_query).fetchall()
 
                 for (table_name,) in tables:
-                    df_extracted, table_info = extract_data(source_conn, table_name, time_last_load)
+                    df_extracted, table_info = extract_data(source_conn, table_name, time_last_load, "stg")
                     load_data_stg(destination_conn, df_extracted, table_name, table_info)
 
             elif destination_name == "dwh":
@@ -55,7 +55,7 @@ def etl_process(dfJob):
                 destination_table_name = destination_tables[0]
                 duplicate_key = dfJob["duplicate_key"].iloc[0]
                 
-                df_extracted, _ = extract_data(source_conn, source_table_name, time_last_load)
+                df_extracted, _ = extract_data(source_conn, source_table_name, time_last_load, "dwh")
                 
                 df_transformed = pd.DataFrame()
                 if dfJob["name"].iloc[0] == "RESIDENT":

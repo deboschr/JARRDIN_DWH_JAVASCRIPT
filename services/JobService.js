@@ -34,6 +34,7 @@ class JobService {
 					source_tables: JSON.parse(item.source_tables),
 					destination_name: item.destination_name,
 					destination_tables: JSON.parse(item.destination_tables),
+					duplicate_key: item.duplicate_key,
 				}));
 
 				return formattedResult;
@@ -43,7 +44,7 @@ class JobService {
 		}
 	}
 
-	static async create(dataJob, dataSession) {
+	static async create(dataJob) {
 		let transaction;
 		try {
 			transaction = await DataWarehouseDB.transaction();
@@ -58,6 +59,7 @@ class JobService {
 					source_tables: dataJob.source_tables,
 					destination_name: dataJob.destination_name,
 					destination_tables: dataJob.destination_tables,
+					duplicate_key: dataJob.duplicate_key,
 					updated_at: dataJob.last_execute,
 				},
 				{ transaction }
