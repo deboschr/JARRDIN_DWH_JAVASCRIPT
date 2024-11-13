@@ -16,9 +16,6 @@ def transform_data_resident(dataframe):
 
    # Memastikan kolom yang tidak ada dalam tabel tujuan (seperti `created_at`, `updated_at`, dan `loaded_at`) dihapus
    transformed_df = transformed_df[['resident_id', 'name', 'phone', 'email', 'address']]
-
-   # Menampilkan hasil transformasi
-   print(transformed_df)
     
    # Mengembalikan dataframe yang sudah ditransformasi
    return transformed_df

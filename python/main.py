@@ -58,7 +58,6 @@ def etl_process(dfJob):
                 if dfJob["name"].iloc[0] == "RESIDENT":
                     source_tabel_name = source_tables[0]
                     df_extracted, table_info = extract_data(source_conn, source_tabel_name, time_last_load)
-                    
                     if not df_extracted.empty:            
                         df_transformed = transform_data_resident(df_extracted)
                         destination_tabel_name = destination_tables[0]
