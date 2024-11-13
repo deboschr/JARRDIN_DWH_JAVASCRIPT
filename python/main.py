@@ -6,7 +6,7 @@ import json
 from connection import create_connection, close_connection
 from _extract import extract_data
 from _transform import transform_data_resident,transform_data_location
-from _load import load_data
+from _load import load_data_stg, load_data_dwh
 
 # Variabel global untuk konfigurasi database
 DB_CONFIG = {
@@ -49,27 +49,21 @@ def etl_process(dfJob):
                     tables = cursor.fetchall()
 
                     for (table_name,) in tables:
-                        extracted_data, table_info = extract_data(source_conn, table_name, time_last_load)
+                        df_extracted, table_info = extract_data(source_conn, table_name, time_last_load)
 
-                        if not extracted_data.empty:
-                            load_data(destination_conn, extracted_data, table_name, table_info, destination_name)
+                        if not df_extracted.empty:
+                            load_data_stg(destination_conn, df_extracted, table_name, table_info)
 
             elif destination_name == "dwh":
-                # ini bisa print
-                print(dfJob["name"].iloc[0])
                 if dfJob["name"].iloc[0] == "RESIDENT":
                     source_tabel_name = source_tables[0]
-                    extracted_data, _ = extract_data(source_conn, source_tabel_name, time_last_load)
-                
-                    transformed_data = transform_data_resident(extracted_data)
+                    df_extracted, table_info = extract_data(source_conn, source_tabel_name, time_last_load)
                     
-                    # load_data(destination_conn, transformed_data, table_name, table_info, destination_name)
-                elif dfJob["name"].iloc[0] == "LOCATION":
-                    extracted_data, table_info = extract_data(source_conn, table_name, time_last_load)
-                
-                    transformed_data = transform_data_location(extracted_data)
-                    
-                    load_data(destination_conn, transformed_data, table_name, table_info, destination_name)
+                    if not df_extracted.empty:            
+                        df_transformed = transform_data_resident(df_extracted)
+                        destination_tabel_name = destination_tables[0]
+                        duplicate_key = dfJob["duplicate_key"].iloc[0]
+                        load_data_dwh(destination_conn, df_transformed, destination_tabel_name, duplicate_key)
                 else:
                     # tapi ini error, kenapa?
                     print(f"ETL for {dfJob['name'].iloc[0]} is not configure.")
