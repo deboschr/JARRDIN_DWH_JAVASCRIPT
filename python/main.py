@@ -70,7 +70,7 @@ def etl_process(dfJob):
                 else:
                     print(f"ETL for {dfJob['name'].iloc[0]} is not configured.")
                     return
-                
+                print(df_transformed)
                 load_data_dwh(destination_conn, df_transformed, destination_table_name, duplicate_key)
                 
                 
