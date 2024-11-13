@@ -44,8 +44,8 @@ def extract_data(source_conn, table_name, time_last_load, batch_size=500):
                 
                 # Menyusun informasi tabel untuk dikembalikan
                 table_info = {
-                    "columns": columns,
-                    "primary_keys": [pk['Column_name'] for pk in primary_keys]  # Mengambil nama kolom primary key
+                    "columns": [(col[0], col[1], col[2]) for col in columns],  # Ambil nama kolom, tipe data, dan nullable
+                    "primary_keys": [pk[4] for pk in primary_keys]  # Mengambil nama kolom primary key dengan indeks 4
                 }
                 return full_data, table_info
             else:
