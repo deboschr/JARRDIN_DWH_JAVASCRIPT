@@ -4,7 +4,7 @@ import pandas as pd
 from sqlalchemy import text
 from connection import create_connection, close_connection
 from _extract import extract_data
-from _transform import transform_data_resident, transform_data_tower, transform_data_floor, transform_data_unit
+from _transform import transform_data_resident, transform_data_tower, transform_data_floor, transform_data_unit, transform_data_contract
 from _load import load_data_stg, load_data_dwh
 
 # Variabel global untuk konfigurasi database
@@ -69,6 +69,8 @@ def etl_process(dfJob):
                     df_transformed = transform_data_unit(df_extracted, df_extracted2, destination_conn)
                 elif dfJob['name'].iloc[0] == "RESIDENT":  
                     df_transformed = transform_data_resident(df_extracted)
+                elif dfJob['name'].iloc[0] == "CONTRACT":  
+                    df_transformed = transform_data_contract(df_extracted, destination_conn)
                 else:
                     print(f"ETL for {dfJob['name'].iloc[0]} is not configured.")
                     return

@@ -91,3 +91,35 @@ def transform_data_unit(df_location, df_contract, dwh_conn):
    return df_unit
 
 
+def transform_data_contract(df_contract, dwh_conn):
+   
+   if df_contract.empty:
+      return df_contract
+
+   # Mendapatkan mapping unit_id dari dim_unit di database
+   query = text("SELECT unit_id, name AS unit_name FROM dim_unit")
+   df_unit = pd.read_sql(query, dwh_conn)
+   
+   # Memilih dan merename kolom untuk disesuaikan dengan tabel tujuan
+   df_contract_temp = df_contract.rename(columns={
+      'contract_id': 'contract_id',
+      'contract_date': 'contract_date',
+      'contract_start': 'start_date',
+      'contract_end': 'end_date',
+      'contract_tenant': 'resident_id',
+      'lokasi': 'unit_name',
+      'contract_tenant_type': 'type'
+   })
+   
+   # Memastikan kolom yang tidak ada dalam tabel tujuan (seperti `created_at`, `updated_at`, dan `loaded_at`) dihapus
+   df_contract_temp = df_contract_temp[['contract_id','contract_date','start_date','end_date','resident_id','unit_name','type']]
+
+   # Gabungkan df_contract_temp dengan df_unit berdasarkan kolom 'unit_name'
+   df_transformed = df_contract_temp.merge(df_unit, left_on='unit_name', right_on='unit_name', how='left')
+
+
+   # Hapus kolom 'unit_name'
+   df_transformed = df_transformed.drop(columns=['unit_name'])
+    
+   # Mengembalikan df_contract yang sudah ditransformasi
+   return df_transformed
