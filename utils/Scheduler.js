@@ -74,7 +74,7 @@ class Scheduler {
 
 				pythonProcess.on("close", async (code) => {
 					if (code === 0) {
-						await findJob.update({ count: findJob.count + 1 });
+						// await findJob.update({ count: findJob.count + 1 });
 					}
 					console.log(`ETL process exited with code: ${code}`);
 				});

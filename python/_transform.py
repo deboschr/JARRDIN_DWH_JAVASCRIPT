@@ -61,15 +61,20 @@ def transform_data_unit(df_location, df_contract, dwh_conn):
    # Query untuk mendapatkan data floor dari dim_floor
    floor_query = text("SELECT floor_id, tower_id, name FROM dim_floor")
    df_floor = pd.read_sql(floor_query, dwh_conn)
+   df_floor = df_floor.rename(columns={"name": "floor"})
+   
       
    # Query untuk mendapatkan data tower dari dim_tower
    tower_query = text("SELECT tower_id, name FROM dim_tower")
    df_tower = pd.read_sql(tower_query, dwh_conn)
+   df_tower = df_tower.rename(columns={"name": "tower"})
       
    # Gabungkan tower dan floor untuk mendapatkan floor_id
    df_floor = df_floor.merge(df_tower, left_on="tower_id", right_on="tower_id")
-   df_location = df_location.merge(df_floor, left_on=["tower", "floor"], right_on=["name_y", "name"])
-      
+   
+   # Gabungkan df_location dengan df_floor berdasarkan tower dan floor
+   df_location = df_location.merge(df_floor, left_on=["tower", "floor"], right_on=["tower", "floor"], how="left")
+   
    # Step 2: Ambil resident_id berdasarkan kode_unit dari df_contract
    df_unit_temp = df_location.merge(df_contract[['kode_unit', 'kode_pemilik_penyewa']], on='kode_unit', how='left')
       
@@ -81,6 +86,8 @@ def transform_data_unit(df_location, df_contract, dwh_conn):
       "kode_tu": "type",
       "luas_unit": "area"
    })[["floor_id", "resident_id", "name", "type", "area"]]
-
+   
    # Mengembalikan dataframe df_unit yang siap di-load ke dim_unit
    return df_unit
+
+
