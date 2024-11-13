@@ -18,18 +18,18 @@ const JobModel = DataWarehouseDB.define(
 			type: DataTypes.TIME,
 			allowNull: true,
 		},
-		count: {
+		step: {
 			type: DataTypes.INTEGER,
-			defaultValue: 0,
 			allowNull: false,
 		},
 		period: {
 			type: DataTypes.ENUM("MINUTE", "HOUR", "DAY", "MONTH", "YEAR"),
 			allowNull: false,
 		},
-		trigger: {
+		count: {
 			type: DataTypes.INTEGER,
-			allowNull: true,
+			defaultValue: 0,
+			allowNull: false,
 		},
 		source_name: {
 			type: DataTypes.STRING(100),
