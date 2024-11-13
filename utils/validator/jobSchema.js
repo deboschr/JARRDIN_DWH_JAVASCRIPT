@@ -22,12 +22,20 @@ const jobSchema = {
 			source_tables: Joi.array()
 				.items(Joi.string().min(3).max(100).required())
 				.min(1)
-				.required(),
+				.when("source_name", {
+					is: "stg",
+					then: Joi.required(),
+					otherwise: Joi.forbidden(),
+				}),
 			destination_name: Joi.string().min(3).max(100).required(),
 			destination_tables: Joi.array()
 				.items(Joi.string().min(3).max(100).required())
 				.min(1)
-				.required(),
+				.when("destination_name", {
+					is: "dwh",
+					then: Joi.required(),
+					otherwise: Joi.forbidden(),
+				}),
 		}).required();
 
 		return schema.validate(job);

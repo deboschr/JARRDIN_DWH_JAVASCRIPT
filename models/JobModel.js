@@ -37,7 +37,7 @@ const JobModel = DataWarehouseDB.define(
 		},
 		source_tables: {
 			type: DataTypes.JSON,
-			allowNull: false,
+			allowNull: true,
 		},
 		destination_name: {
 			type: DataTypes.STRING(100),
@@ -45,7 +45,7 @@ const JobModel = DataWarehouseDB.define(
 		},
 		destination_tables: {
 			type: DataTypes.JSON,
-			allowNull: false,
+			allowNull: true,
 		},
 		created_at: {
 			type: DataTypes.DATE,

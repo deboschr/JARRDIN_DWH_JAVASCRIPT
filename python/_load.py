@@ -34,6 +34,9 @@ def load_data_stg(stg_conn, data, source_table, table_info):
 
     # Menyimpan data ke tabel staging
     data.to_sql(destination_table, stg_conn.engine, if_exists='append', index=False)
+    
+    stg_conn.commit()
+    
     print(f"{len(data)} baris data dimasukkan ke tabel {destination_table}.")
 
 
@@ -54,5 +57,7 @@ def load_data_dwh(dwh_conn, data, destination_table, duplicate_key):
     # Execute upsert for each row in the data
     for _, row in data.iterrows():
         dwh_conn.execute(text(insert_query), row.to_dict())
+        
+    dwh_conn.commit()
 
     print(f"{len(data)} baris data diperbarui atau dimasukkan ke tabel {destination_table}.")
