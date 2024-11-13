@@ -1,4 +1,5 @@
 from sqlalchemy import text
+import pandas as pd
 
 def load_data_stg(stg_conn, data, source_table, table_info):
     if data.empty or table_info is None:
@@ -44,6 +45,9 @@ def load_data_dwh(dwh_conn, data, destination_table, duplicate_key):
     if data.empty:
         return
 
+    # Menangani nilai NaN dengan menggantinya menjadi None (NULL di MySQL)
+    data = data.where(pd.notnull(data), None)
+    
     # Menentukan kolom yang akan diperbarui jika terjadi duplikasi
     non_key_columns = [col for col in data.columns if col not in duplicate_key]
     
