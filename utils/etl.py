@@ -1,7 +1,7 @@
 import pymysql
 import json
 import sys
-from utils.connection import create_connection, close_connection
+from connection import create_connection, close_connection
 from datetime import datetime
 from dateutil import parser
 import pandas as pd
@@ -181,16 +181,19 @@ if __name__ == "__main__":
             if dfJob.empty:
                 print(f"Job with name {job_name} not found.")
             else:
-                config = json.loads(dfJob["config"].iloc[0])
-                source = config.get("source")
-                destination = config.get("destination")
+                source_name = dfJob["source_name"].iloc[0]
+                source_tables = dfJob["source_tables"].iloc[0]
+                destination_name = dfJob["destination_name"].iloc[0]
+                destination_tables = dfJob["destination_tables"].iloc[0]
                 time_last_load = dfJob["last_execute"].iloc[0]
                 
-                print("source =>", source)
-                print("destination =>", destination)
+                print("source_name =>", source_name)
+                print("source_tables =>", source_tables)
+                print("destination_name =>", destination_name)
+                print("destination_tables =>", destination_tables)
                 print("time_last_load =>", time_last_load)
                 
-                etl_process(source, destination, time_last_load)
+                # etl_process(source_name, source_tables, destination_name, destination_tables, time_last_load)
 
         except pymysql.MySQLError as e:
             print(f"Error during get job: {e}")

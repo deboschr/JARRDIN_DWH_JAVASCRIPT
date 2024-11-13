@@ -4,11 +4,6 @@ import pymysql
 # Menyimpan koneksi untuk berbagai database
 CONNECTIONS = {}
 
-# Membaca konfigurasi database dari file konfigurasi
-def load_db_config():
-    with open('config/database.json', 'r') as f:
-        return json.load(f)
-
 # Fungsi untuk membuat koneksi ke database
 def create_connection(dataDb):
     global CONNECTIONS
@@ -67,14 +62,3 @@ def get_connection(dbName=None):
     else:
         print(f">> Tidak ada koneksi yang ditemukan untuk {dbName}.")
         return None
-
-def main():
-    # Memuat konfigurasi dari file JSON
-    db_config = load_db_config()
-
-    # Membuat koneksi untuk setiap database (dwh, stg, dll.)
-    create_connection(db_config['dwh'])
-    create_connection(db_config['stg'])
-
-if __name__ == "__main__":
-    main()

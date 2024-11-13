@@ -46,7 +46,7 @@ class Scheduler {
 					new Date().toLocaleString()
 				);
 
-				const findJob = await JobModel.finOne({
+				const findJob = await JobModel.findOne({
 					where: { name: dataJob.name },
 				});
 
@@ -55,7 +55,10 @@ class Scheduler {
 				}
 
 				// Jalankan proses ETL dengan last_execute terbaru
-				const pythonProcess = spawn("python3", ["services/etl.py", jobName]);
+				const pythonProcess = spawn("python3", [
+					"utils/etl.py",
+					findJob.name,
+				]);
 
 				pythonProcess.stdout.on("data", (data) => {
 					console.log(`>> STDOUT: ${data}`);

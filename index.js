@@ -14,8 +14,8 @@ async function initializeApp() {
 	await DatabaseManager.authenticate();
 	// DatabaseManager.synchronize((isForce = false));
 
-	// const { JobService } = require("./services/JobService.js");
-	// await JobService.read((isReload = true));
+	const { JobService } = require("./services/JobService.js");
+	await JobService.read((isReload = true));
 
 	const routes = require("./routes");
 	app.use("/", routes);

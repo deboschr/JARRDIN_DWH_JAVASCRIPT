@@ -20,6 +20,7 @@ class JobService {
 				findJob.forEach((job) => {
 					Scheduler.createTask(job);
 				});
+				console.log(">> Job berhasil di reload.");
 			} else if (!isReload) {
 				const formattedResult = findJob.map((item) => ({
 					job_id: item.job_id,
