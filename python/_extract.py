@@ -41,7 +41,7 @@ def extract_data(source_conn, table_name, time_last_load, batch_size=500):
                     return full_data, table_info
                 else:
                     print("No data extracted.")
-                    return None, None
+                    return pd.DataFrame(), None
     except pymysql.MySQLError as e:
         print(f"Error saat mengekstrak data: {e}")
-        return None, None
+        return pd.DataFrame(), None

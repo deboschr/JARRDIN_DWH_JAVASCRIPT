@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 
 def load_data_stg(stg_conn, data, source_table, table_info):
     
-    if data == None or table_info == None:
+    if data.empty or table_info == None:
         return
     
     cursor = stg_conn.cursor()
@@ -56,7 +56,7 @@ def load_data_stg(stg_conn, data, source_table, table_info):
     cursor.close()
     
 def load_data_dwh(dwh_conn, data, destination_table, duplicate_key):
-    if data == None:
+    if data.empty:
         return
     
     cursor = dwh_conn.cursor()

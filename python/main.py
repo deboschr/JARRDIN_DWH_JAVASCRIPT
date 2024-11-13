@@ -61,7 +61,7 @@ def etl_process(dfJob):
                 
                 df_extracted,_ = extract_data(source_conn, source_tabel_name, time_last_load)
                 
-                df_transformed = None
+                df_transformed = pd.DataFrame()
                 if dfJob["name"].iloc[0] == "RESIDENT":
                     df_transformed = transform_data_resident(df_extracted)
                 else:
