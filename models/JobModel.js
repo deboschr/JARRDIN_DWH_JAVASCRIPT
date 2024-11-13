@@ -46,12 +46,18 @@ const JobModel = DataWarehouseDB.define(
 			type: DataTypes.JSON,
 			allowNull: false,
 		},
+		created_at: {
+			type: DataTypes.DATE,
+			allowNull: true,
+		},
+		updated_at: {
+			type: DataTypes.DATE,
+			allowNull: true,
+		},
 	},
 	{
 		tableName: "job",
-		timestamps: true,
-		createdAt: "created_at",
-		updatedAt: "updated_at",
+		timestamps: false,
 	}
 );
 
