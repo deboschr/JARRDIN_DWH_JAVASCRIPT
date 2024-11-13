@@ -55,10 +55,7 @@ class Scheduler {
 				}
 
 				// Jalankan proses ETL dengan last_execute terbaru
-				const pythonProcess = spawn("python3", [
-					"utils/etl.py",
-					findJob.name,
-				]);
+				const pythonProcess = spawn("python3", ["python/etl.py", findJob.name]);
 
 				pythonProcess.stdout.on("data", (data) => {
 					console.log(`>> STDOUT: ${data}`);
@@ -74,7 +71,8 @@ class Scheduler {
 
 				pythonProcess.on("close", async (code) => {
 					if (code === 0) {
-						await findJob.update({ last_execute: new Date() });
+						const lastExecute = new Date(new Date().toISOString());
+						await findJob.update({ last_execute: lastExecute });
 						console.log(`Job ${dataJob.name} berhasil diupdate.`);
 					}
 					console.log(`ETL process exited with code: ${code}`);
