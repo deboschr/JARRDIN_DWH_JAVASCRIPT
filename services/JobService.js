@@ -31,10 +31,16 @@ class JobService {
 					count: item.count,
 					last_execute: item.updated_at,
 					source_name: item.source_name,
-					source_tables: JSON.parse(item.source_tables),
+					source_tables: item.source_tables
+						? JSON.parse(item.source_tables)
+						: null,
 					destination_name: item.destination_name,
-					destination_tables: JSON.parse(item.destination_tables),
-					duplicate_key: item.duplicate_key,
+					destination_tables: item.destination_tables
+						? JSON.parse(item.destination_tables)
+						: null,
+					duplicate_keys: item.duplicate_keys
+						? JSON.parse(item.duplicate_keys)
+						: null,
 				}));
 
 				return formattedResult;
@@ -59,7 +65,7 @@ class JobService {
 					source_tables: dataJob.source_tables,
 					destination_name: dataJob.destination_name,
 					destination_tables: dataJob.destination_tables,
-					duplicate_key: dataJob.duplicate_key,
+					duplicate_keys: dataJob.duplicate_keys,
 					updated_at: dataJob.last_execute,
 				},
 				{ transaction }

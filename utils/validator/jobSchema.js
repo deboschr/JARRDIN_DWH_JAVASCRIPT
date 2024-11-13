@@ -36,7 +36,7 @@ const jobSchema = {
 					then: Joi.required(),
 					otherwise: Joi.forbidden(),
 				}),
-			duplicate_key: Joi.array()
+			duplicate_keys: Joi.array()
 				.items(Joi.string().min(3).max(100).required())
 				.min(1)
 				.when("destination_name", {

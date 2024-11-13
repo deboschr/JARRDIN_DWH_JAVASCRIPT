@@ -55,7 +55,7 @@ def extract_data(source_conn, table_name, time_last_load, type, batch_size=500):
             }
             return full_data, table_info
         else:
-            print("No data extracted.")
+            print(f"No data extracted for {table_name}.")
             return pd.DataFrame(), None
     except Exception as e:
         print(f"Error saat mengekstrak data: {e}")

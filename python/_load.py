@@ -41,7 +41,7 @@ def load_data_stg(stg_conn, data, source_table, table_info):
     print(f"{len(data)} baris data dimasukkan ke tabel {destination_table}.")
 
 
-def load_data_dwh(dwh_conn, data, destination_table, duplicate_key):
+def load_data_dwh(dwh_conn, data, destination_table, duplicate_keys):
     if data.empty:
         return
 
@@ -49,14 +49,14 @@ def load_data_dwh(dwh_conn, data, destination_table, duplicate_key):
     data = data.where(pd.notnull(data), None)
     
     # Menentukan kolom yang akan diperbarui jika terjadi duplikasi
-    non_key_columns = [col for col in data.columns if col not in duplicate_key]
+    non_key_columns = [col for col in data.columns if col not in duplicate_keys]
     
     # Mengatur query untuk upsert
     insert_query = f"""
     INSERT INTO {destination_table} ({', '.join(data.columns)})
     VALUES ({', '.join([f':{col}' for col in data.columns])})
     ON DUPLICATE KEY UPDATE
-    {', '.join([f"{col} = VALUES({col})" for col in (non_key_columns if non_key_columns else duplicate_key)])}
+    {', '.join([f"{col} = VALUES({col})" for col in (non_key_columns if non_key_columns else duplicate_keys)])}
     """
 
     # Melakukan upsert per baris

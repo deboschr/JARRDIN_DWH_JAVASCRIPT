@@ -29,11 +29,11 @@ DB_CONFIG = {
     }
 }
 
-def etl_process(dfJob):
+def etl_process(dfJob):    
     source_name = dfJob["source_name"].iloc[0]
-    source_tables = json.loads(dfJob["source_tables"].iloc[0])
+    source_tables = json.loads(dfJob["source_tables"].iloc[0] or "[]")
     destination_name = dfJob["destination_name"].iloc[0]
-    destination_tables = json.loads(dfJob["destination_tables"].iloc[0])
+    destination_tables = json.loads(dfJob["destination_tables"].iloc[0] or "[]")
     time_last_load = dfJob["updated_at"].iloc[0]
     
     source_conn = create_connection(DB_CONFIG[source_name])
@@ -45,7 +45,7 @@ def etl_process(dfJob):
                 # Mengambil daftar tabel dari database sumber
                 tables_query = text("SHOW TABLES")
                 tables = source_conn.execute(tables_query).fetchall()
-
+                
                 for (table_name,) in tables:
                     df_extracted, table_info = extract_data(source_conn, table_name, time_last_load, "stg")
                     load_data_stg(destination_conn, df_extracted, table_name, table_info)
@@ -54,7 +54,7 @@ def etl_process(dfJob):
 
                 source_table_name = source_tables[0]
                 destination_table_name = destination_tables[0]
-                duplicate_key = json.loads(dfJob["duplicate_key"].iloc[0])
+                duplicate_keys = json.loads(dfJob["duplicate_keys"].iloc[0] or "[]")
                 
                 df_extracted, _ = extract_data(source_conn, source_table_name, time_last_load, "dwh")
                 
@@ -73,7 +73,7 @@ def etl_process(dfJob):
                     print(f"ETL for {dfJob['name'].iloc[0]} is not configured.")
                     return
                 
-                load_data_dwh(destination_conn, df_transformed, destination_table_name, duplicate_key)
+                load_data_dwh(destination_conn, df_transformed, destination_table_name, duplicate_keys)
                 
                 
         except Exception as e:
@@ -96,7 +96,6 @@ if __name__ == "__main__":
             # Mengambil data pekerjaan dari tabel `job`
             query = text("SELECT * FROM job WHERE name = :job_name")
             dfJob = pd.read_sql(query, dwh_conn, params={"job_name": job_name})
-            
             if dfJob.empty:
                 print(f"Job with name {job_name} not found.")
             else:
