@@ -71,6 +71,8 @@ def etl_process(dfJob):
                     df_transformed = transform_data_resident(df_extracted)
                 elif dfJob['name'].iloc[0] == "CONTRACT":  
                     df_transformed = transform_data_contract(df_extracted, destination_conn)
+                elif dfJob['name'].iloc[0] == "INVOICE":  
+                    df_transformed = transform_data_contract(df_extracted, destination_conn)
                 else:
                     print(f"ETL for {dfJob['name'].iloc[0]} is not configured.")
                     return
