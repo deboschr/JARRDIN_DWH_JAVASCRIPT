@@ -1,5 +1,5 @@
 const { JobModel } = require("../models/JobModel");
-const { Scheduler } = require("../utils/Scheduler");
+const { ScheduleManager } = require("../utils/ScheduleManager.js");
 const {
 	DatabaseManager,
 	Sequelize,
@@ -18,7 +18,7 @@ class JobService {
 			// Menjadwal ulang semua job jika reload = true
 			if (isReload && findJob.length > 0) {
 				findJob.forEach((job) => {
-					Scheduler.createTask(job);
+					ScheduleManager.createTask(job);
 				});
 				console.log(">> Job berhasil di reload.");
 			} else if (!isReload) {
@@ -73,7 +73,7 @@ class JobService {
 			);
 
 			// Menjadwalkan job
-			Scheduler.createTask(createJob);
+			ScheduleManager.createTask(createJob);
 
 			await transaction.commit();
 
@@ -105,7 +105,7 @@ class JobService {
 			}
 
 			// Menghentikan job dari penjadwalan
-			Scheduler.cancelTask(findJob.name);
+			ScheduleManager.cancelTask(findJob.name);
 
 			// Menghapus job dari database
 			await findJob.destroy({ transaction });

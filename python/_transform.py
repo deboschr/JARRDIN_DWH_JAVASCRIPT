@@ -20,7 +20,6 @@ def transform_data_resident(df_resident):
     
    # Mengembalikan df_resident yang sudah ditransformasi
    return df_transformed
-
    
 def transform_data_tower(df_location):
    if df_location.empty:
@@ -51,7 +50,6 @@ def transform_data_floor(df_location, dwh_conn):
       
    # Mengembalikan dataframe df_floor yang berisi tower_id dan name
    return df_floor
-
 
 def transform_data_unit(df_location, df_contract, dwh_conn):
    if df_location.empty or df_contract.empty:
@@ -90,7 +88,6 @@ def transform_data_unit(df_location, df_contract, dwh_conn):
    # Mengembalikan dataframe df_unit yang siap di-load ke dim_unit
    return df_unit
 
-
 def transform_data_contract(df_contract, dwh_conn):
    
    if df_contract.empty:
@@ -124,9 +121,14 @@ def transform_data_contract(df_contract, dwh_conn):
    # Mengembalikan df_contract yang sudah ditransformasi
    return df_transformed
 
-
-def transform_data_invoice(df_invoice):
+def transform_data_invoice(df_invoice, dwh_conn):
    if df_invoice.empty:
       return df_invoice
    
-   return df_
+   return df_invoice
+
+def transform_data_payment(df_payment, dwh_conn):
+   if df_payment.empty:
+      return df_payment
+   
+   return df_payment

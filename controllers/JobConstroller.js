@@ -1,5 +1,5 @@
 const { JobService } = require("../services/JobService");
-const { Validator } = require("../utils/validator");
+const { Validator } = require("../utils/validators");
 
 class JobController {
 	static async get(req, res) {

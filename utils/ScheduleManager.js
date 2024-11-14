@@ -2,7 +2,7 @@ const schedule = require("node-schedule");
 const { spawn } = require("child_process");
 const { JobModel } = require("../models/JobModel");
 
-class Scheduler {
+class ScheduleManager {
 	static JOBS = {};
 
 	static createTask(dataJob) {
@@ -108,4 +108,4 @@ class Scheduler {
 	}
 }
 
-module.exports = { Scheduler };
+module.exports = { ScheduleManager };
