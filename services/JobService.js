@@ -41,6 +41,7 @@ class JobService {
 					duplicate_keys: item.duplicate_keys
 						? JSON.parse(item.duplicate_keys)
 						: null,
+					status: item.status,
 				}));
 
 				return formattedResult;

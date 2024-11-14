@@ -1,0 +1,16 @@
+[
+	{
+		"job_id": 16,
+		"name": "CONTRACT",
+		"time": "00:00:00",
+		"step": 2,
+		"period": "MINUTE",
+		"count": 0,
+		"last_execute": "2024-11-12T12:00:00.000Z",
+		"source_name": "stg",
+		"source_tables": ["stg_tn_contract"],
+		"destination_name": "dwh",
+		"destination_tables": ["dim_contract"],
+		"duplicate_keys": ["contract_id"]
+	}
+]

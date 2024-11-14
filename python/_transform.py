@@ -123,3 +123,10 @@ def transform_data_contract(df_contract, dwh_conn):
     
    # Mengembalikan df_contract yang sudah ditransformasi
    return df_transformed
+
+
+def transform_data_invoice(df_invoice):
+   if df_invoice.empty:
+      return df_invoice
+   
+   return df_

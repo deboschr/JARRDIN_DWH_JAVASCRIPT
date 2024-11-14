@@ -51,6 +51,11 @@ const JobModel = DataWarehouseDB.define(
 			type: DataTypes.JSON,
 			allowNull: true,
 		},
+		status: {
+			type: DataTypes.ENUM("ACTIVE", "NONACTIVE"),
+			defaultValue: "ACTIVE",
+			allowNull: false,
+		},
 		created_at: {
 			type: DataTypes.DATE,
 			allowNull: true,
