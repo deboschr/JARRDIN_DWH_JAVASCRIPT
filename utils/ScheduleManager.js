@@ -7,6 +7,11 @@ class ScheduleManager {
 
 	static createTask(dataJob) {
 		try {
+			if (this.JOBS[dataJob.name]) {
+				console.log(`>> Job ${dataJob.name} sedang running.`);
+				return;
+			}
+
 			let rule = new schedule.RecurrenceRule();
 
 			// Parsing waktu jika periode bukan MINUTE atau HOUR

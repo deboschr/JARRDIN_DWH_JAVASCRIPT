@@ -91,6 +91,64 @@ class JobService {
 		}
 	}
 
+	static async activate(jobId) {
+		let transaction;
+		try {
+			transaction = await DataWarehouseDB.transaction();
+
+			const findJob = await JobModel.findOne({
+				where: { job_id: jobId },
+			});
+
+			if (!findJob) {
+				throw new Error(`Job tidak ditemukan.`);
+			}
+
+			// Menambahkan job ke penjadwalan
+			ScheduleManager.createTask(findJob.name);
+
+			// Menghapus job dari database
+			await findJob.update({ status: "ACTIVE" }, { transaction });
+
+			await transaction.commit();
+
+			return findJob;
+		} catch (error) {
+			if (transaction) await transaction.rollback();
+
+			throw error;
+		}
+	}
+
+	static async nonactivate(jobId) {
+		let transaction;
+		try {
+			transaction = await DataWarehouseDB.transaction();
+
+			const findJob = await JobModel.findOne({
+				where: { job_id: jobId },
+			});
+
+			if (!findJob) {
+				throw new Error(`Job tidak ditemukan.`);
+			}
+
+			// Menghentikan job dari penjadwalan
+			ScheduleManager.cancelTask(findJob.name);
+
+			// Menghapus job dari database
+			await findJob.update({ status: "NONACTIVE" }, { transaction });
+
+			await transaction.commit();
+
+			return findJob;
+		} catch (error) {
+			if (transaction) await transaction.rollback();
+
+			throw error;
+		}
+	}
+
 	static async delete(jobId) {
 		let transaction;
 		try {

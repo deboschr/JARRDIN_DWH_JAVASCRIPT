@@ -7,6 +7,16 @@ const { Authorization } = require("../utils/Authorization");
 // Schedule
 router.get("/", Authorization.decryption, JobController.get);
 router.post("/", Authorization.decryption, JobController.post);
+router.patch(
+	"/active/:id",
+	Authorization.decryption,
+	JobController.patchActive
+);
+router.patch(
+	"/nonactive/:id",
+	Authorization.decryption,
+	JobController.patchNonactive
+);
 router.delete("/:id", Authorization.decryption, JobController.delete);
 
 module.exports = router;

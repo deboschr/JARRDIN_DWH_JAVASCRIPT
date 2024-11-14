@@ -32,6 +32,28 @@ class JobController {
 		}
 	}
 
+	static async patchActive(req, res) {
+		try {
+			const activateJob = await JobService.activate(req.params.id);
+
+			res.status(200).json({ success: true });
+		} catch (error) {
+			console.error(error);
+			res.status(error.status || 500).json({ error: error.message });
+		}
+	}
+
+	static async patchNonactive(req, res) {
+		try {
+			const nonactivateJob = await JobService.nonactivate(req.params.id);
+
+			res.status(200).json({ success: true });
+		} catch (error) {
+			console.error(error);
+			res.status(error.status || 500).json({ error: error.message });
+		}
+	}
+
 	static async delete(req, res) {
 		try {
 			const deleteJob = await JobService.delete(req.params.id);
