@@ -4,10 +4,13 @@ const router = express.Router();
 const { UserController } = require("../controllers/UserConstroller");
 const { Authorization } = require("../utils/Authorization");
 
-// Schedule
-router.get("/", Authorization.decryption, UserController.get);
-router.post("/login", UserController.login);
-router.post("/register", Authorization.decryption, UserController.register);
+router.post("/signin", UserController.signin);
+router.post("/signup", Authorization.decryption, UserController.signup);
+router.post("/signout", Authorization.decryption, UserController.signout);
+
+router.get("/", Authorization.decryption, UserController.getAll);
+router.get("/:id", Authorization.decryption, UserController.getOne);
+router.patch("/:id", Authorization.decryption, UserController.update);
 router.delete("/:id", Authorization.decryption, UserController.delete);
 
 module.exports = router;

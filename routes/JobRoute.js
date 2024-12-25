@@ -4,19 +4,12 @@ const router = express.Router();
 const { JobController } = require("../controllers/JobConstroller");
 const { Authorization } = require("../utils/Authorization");
 
-// Schedule
-router.get("/", Authorization.decryption, JobController.get);
-router.post("/", Authorization.decryption, JobController.post);
-router.patch(
-	"/active/:id",
-	Authorization.decryption,
-	JobController.patchActive
-);
-router.patch(
-	"/nonactive/:id",
-	Authorization.decryption,
-	JobController.patchNonactive
-);
-router.delete("/:id", Authorization.decryption, JobController.delete);
+router.use("/", Authorization.decryption);
+
+router.get("/", JobController.getAll);
+router.get("/:id", JobController.getOne);
+router.post("/", JobController.post);
+router.patch("/:id", JobController.update);
+router.delete("/:id", JobController.delete);
 
 module.exports = router;
