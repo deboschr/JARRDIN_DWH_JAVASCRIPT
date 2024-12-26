@@ -1,11 +1,9 @@
+const DatabaseConnection = require("../config/DatabaseConnection.js");
+const MyDB = DatabaseConnection.getConnection();
+const { Sequelize } = require("sequelize");
+
 const { JobModel } = require("../models/JobModel");
 const { ScheduleManager } = require("../utils/ScheduleManager.js");
-const {
-	DatabaseManager,
-	Sequelize,
-	Op,
-} = require("../config/DatabaseManager.js");
-const DataWarehouseDB = DatabaseManager.getDatabase();
 
 class JobService {
 	static async read(isReload = false) {
@@ -54,7 +52,7 @@ class JobService {
 	static async create(dataJob) {
 		let transaction;
 		try {
-			transaction = await DataWarehouseDB.transaction();
+			transaction = await MyDB.transaction();
 
 			const createJob = await JobModel.create(
 				{
@@ -94,7 +92,7 @@ class JobService {
 	static async activate(jobId) {
 		let transaction;
 		try {
-			transaction = await DataWarehouseDB.transaction();
+			transaction = await MyDB.transaction();
 
 			const findJob = await JobModel.findOne({
 				where: { job_id: jobId },
@@ -123,7 +121,7 @@ class JobService {
 	static async nonactivate(jobId) {
 		let transaction;
 		try {
-			transaction = await DataWarehouseDB.transaction();
+			transaction = await MyDB.transaction();
 
 			const findJob = await JobModel.findOne({
 				where: { job_id: jobId },
@@ -152,7 +150,7 @@ class JobService {
 	static async delete(jobId) {
 		let transaction;
 		try {
-			transaction = await DataWarehouseDB.transaction();
+			transaction = await MyDB.transaction();
 
 			const findJob = await JobModel.findOne({
 				where: { job_id: jobId },

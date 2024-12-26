@@ -1,7 +1,8 @@
-const { DatabaseManager, DataTypes } = require("../config/DatabaseManager.js");
-const DataWarehouseDB = DatabaseManager.getDatabase(process.env.DB_NAME);
+const DatabaseConnection = require("../config/DatabaseConnection.js");
+const MyDB = DatabaseConnection.getConnection();
+const { DataTypes } = require("sequelize");
 
-const UserModel = DataWarehouseDB.define(
+const UserModel = MyDB.define(
 	"user",
 	{
 		user_id: {

@@ -1,7 +1,8 @@
-const { DatabaseManager, DataTypes } = require("../config/DatabaseManager.js");
-const DataWarehouseDB = DatabaseManager.getDatabase();
+const DatabaseConnection = require("../config/DatabaseConnection.js");
+const MyDB = DatabaseConnection.getConnection();
+const { DataTypes } = require("sequelize");
 
-const JobModel = DataWarehouseDB.define(
+const JobModel = MyDB.define(
 	"job",
 	{
 		job_id: {

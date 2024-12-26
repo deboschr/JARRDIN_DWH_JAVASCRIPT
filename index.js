@@ -2,10 +2,10 @@ const express = require("express");
 const dotenv = require("dotenv");
 const expressLayouts = require("express-ejs-layouts");
 
-const { DatabaseManager } = require("./config/DatabaseManager.js");
-const app = express();
-
 dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -15,22 +15,27 @@ app.use(expressLayouts);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-async function initializeApp() {
-	// Inisialisasi DatabaseManager dan koneksi database
-	new DatabaseManager();
-	await DatabaseManager.authenticate();
-	DatabaseManager.synchronize((isForce = false));
+// Initialize the database connection
+const DatabaseConnection = require("./config/DatabaseConnection");
+DatabaseConnection.authenticate()
+	.then(() => {
+		DatabaseConnection.synchronize().then(async () => {
+			// const { JobService } = require("./services/JobService.js");
+			// await JobService.read(true);
 
-	// const { JobService } = require("./services/JobService.js");
-	// await JobService.read((isReload = true));
+			const routes = require("./routes");
+			app.use("/", routes);
 
-	const routes = require("./routes");
-	app.use("/", routes);
-
-	const port = 3000;
-	app.listen(port, () => {
-		console.log(`>> Server is running on http://localhost:${port}`);
+			app.listen(PORT, () => {
+				console.log(`>> Server is running on http://localhost:${PORT}`);
+			});
+		});
+	})
+	.catch((err) => {
+		console.error("Failed to connect to the database or synchronize it:", err);
 	});
-}
 
-initializeApp();
+// It's useful to handle possible errors when starting the server
+app.on("error", (error) => {
+	console.error(`Error occurred starting the server: ${error.message}`);
+});

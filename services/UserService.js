@@ -1,11 +1,8 @@
-const { UserModel } = require("../models/UserModel");
+const DatabaseConnection = require("../config/DatabaseConnection.js");
+const MyDB = DatabaseConnection.getConnection();
+const { Sequelize } = require("sequelize");
 
-const {
-	DatabaseManager,
-	Sequelize,
-	Op,
-} = require("../config/DatabaseManager.js");
-const DataWarehouseDB = DatabaseManager.getDatabase();
+const { UserModel } = require("../models/UserModel");
 
 class UserService {
 	static async readAll() {
@@ -39,7 +36,7 @@ class UserService {
 	static async create(dataUser) {
 		let transaction;
 		try {
-			transaction = await DataWarehouseDB.transaction();
+			transaction = await MyDB.transaction();
 
 			const createUser = await UserModel.create(
 				{
@@ -68,7 +65,7 @@ class UserService {
 	static async delete(userId) {
 		let transaction;
 		try {
-			transaction = await DataWarehouseDB.transaction();
+			transaction = await MyDB.transaction();
 
 			const findUser = await UserModel.finOne({
 				where: { user_id: userId },
