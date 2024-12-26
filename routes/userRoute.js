@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const { UserController } = require("../controllers/UserConstroller");
-const { Authorization } = require("../utils/Authorization");
+const { Authorization } = require("../middlewares/Authorization");
 
+router.get("/signin", UserController.signinPage);
 router.post("/signin", UserController.signin);
 router.post("/signup", Authorization.decryption, UserController.signup);
 router.post("/signout", Authorization.decryption, UserController.signout);

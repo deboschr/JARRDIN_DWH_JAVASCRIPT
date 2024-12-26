@@ -1,0 +1,68 @@
+/* job.css */
+#job-header {
+	margin: 20px 0;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+#btnAddJob {
+	padding: 10px 20px;
+	background-color: #28a745;
+	color: white;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+}
+
+#btnAddJob:hover {
+	background-color: #218838;
+}
+
+#jobTable {
+	width: 100%;
+	border-collapse: collapse;
+	margin-top: 20px;
+}
+
+#jobTable th,
+#jobTable td {
+	border: 1px solid #ddd;
+	padding: 8px;
+	text-align: left;
+}
+
+#jobTable th {
+	background-color: #f9f9f9;
+}
+
+.action-buttons {
+	display: flex;
+	gap: 10px;
+}
+
+.button-edit,
+.button-delete {
+	padding: 5px 10px;
+	border: none;
+	border-radius: 3px;
+	cursor: pointer;
+}
+
+.button-edit {
+	background-color: #ffc107;
+	color: #212529;
+}
+
+.button-delete {
+	background-color: #dc3545;
+	color: white;
+}
+
+.button-edit:hover {
+	background-color: #e0a800;
+}
+
+.button-delete:hover {
+	background-color: #c82333;
+}

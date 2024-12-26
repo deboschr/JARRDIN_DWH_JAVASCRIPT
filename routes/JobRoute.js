@@ -2,9 +2,9 @@ const express = require("express");
 const router = express.Router();
 
 const { JobController } = require("../controllers/JobConstroller");
-const { Authorization } = require("../utils/Authorization");
+const { Authorization } = require("../middlewares/Authorization");
 
-router.use("/", Authorization.decryption);
+// router.use("/", Authorization.decryption);
 
 router.get("/", JobController.getAll);
 router.get("/:id", JobController.getOne);

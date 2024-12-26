@@ -23,7 +23,7 @@ class Authorization {
 			const token = req.headers["token"];
 
 			if (!token) {
-				return res.status(401).json({ message: "Unauthorized" });
+				return res.redirect("/user/signin");
 			}
 
 			req.dataSession = jwt.verify(token, process.env.SECRET_KEY);

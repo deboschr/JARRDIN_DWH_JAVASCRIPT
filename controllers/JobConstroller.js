@@ -2,7 +2,22 @@ const { JobService } = require("../services/JobService");
 const { Validator } = require("../utils/validators");
 
 class JobController {
-	static async get(req, res) {
+	static async getAll(req, res) {
+		try {
+			let readJob = await JobService.read();
+
+			res.status(200).render("job", {
+				page: "job",
+				layout: "layouts/main",
+				data: JSON.stringify(readJob),
+			});
+		} catch (error) {
+			console.error(error);
+			res.status(error.status || 500).json({ error: error.message });
+		}
+	}
+
+	static async getOne(req, res) {
 		try {
 			let readJob = await JobService.read();
 
@@ -32,20 +47,9 @@ class JobController {
 		}
 	}
 
-	static async patchActive(req, res) {
+	static async update(req, res) {
 		try {
 			const activateJob = await JobService.activate(req.params.id);
-
-			res.status(200).json({ success: true });
-		} catch (error) {
-			console.error(error);
-			res.status(error.status || 500).json({ error: error.message });
-		}
-	}
-
-	static async patchNonactive(req, res) {
-		try {
-			const nonactivateJob = await JobService.nonactivate(req.params.id);
 
 			res.status(200).json({ success: true });
 		} catch (error) {

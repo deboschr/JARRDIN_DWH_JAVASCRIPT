@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link rel="stylesheet" href="css/index.css" />
+		<link rel="stylesheet" href="css/<%= page %>.css" />
+		<title><%= page %></title>
+	</head>
+	<body>
+		<div id="main-container">
+			<div id="navbar"><%- include('navbar') %></div>
+			<div id="content"><%- body %></div>
+		</div>
+		<script src="js/<%= page %>.js"></script>
+	</body>
+</html>
