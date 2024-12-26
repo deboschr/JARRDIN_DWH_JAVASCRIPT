@@ -4,31 +4,9 @@ const { PasswordManager } = require("../utils/PasswordManager");
 const { Authorization } = require("../middlewares/Authorization");
 
 class UserController {
-	static async signinPage(req, res) {
+	static async authPage(req, res) {
 		try {
 			res.render("signin", { layout: false });
-		} catch (error) {
-			console.error(error);
-			res.status(error.status || 500).json({ error: error.message });
-		}
-	}
-
-	static async getAll(req, res) {
-		try {
-			let readUser = await UserService.readAll();
-
-			res.status(200).json(readUser);
-		} catch (error) {
-			console.error(error);
-			res.status(error.status || 500).json({ error: error.message });
-		}
-	}
-
-	static async getOne(req, res) {
-		try {
-			let readUser = await UserService.readAll();
-
-			res.status(200).json(readUser);
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });
@@ -135,6 +113,28 @@ class UserController {
 			const createUser = await UserService.create(req.body);
 
 			res.status(200).json({ success: true });
+		} catch (error) {
+			console.error(error);
+			res.status(error.status || 500).json({ error: error.message });
+		}
+	}
+
+	static async userPage(req, res) {
+		try {
+			let readUser = await UserService.readAll();
+
+			res.status(200).json(readUser);
+		} catch (error) {
+			console.error(error);
+			res.status(error.status || 500).json({ error: error.message });
+		}
+	}
+
+	static async getOne(req, res) {
+		try {
+			let readUser = await UserService.readAll();
+
+			res.status(200).json(readUser);
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });

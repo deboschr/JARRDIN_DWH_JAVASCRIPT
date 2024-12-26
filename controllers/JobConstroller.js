@@ -2,7 +2,7 @@ const { JobService } = require("../services/JobService");
 const { Validator } = require("../utils/validators");
 
 class JobController {
-	static async getAll(req, res) {
+	static async jobPage(req, res) {
 		try {
 			let readJob = await JobService.read();
 

@@ -6,7 +6,7 @@ const { Authorization } = require("../middlewares/Authorization");
 
 router.use("/", Authorization.decryption);
 
-router.get("/", JobController.getAll);
+router.get("/", JobController.jobPage);
 router.get("/:id", JobController.getOne);
 router.post("/", JobController.post);
 router.patch("/:id", JobController.update);
