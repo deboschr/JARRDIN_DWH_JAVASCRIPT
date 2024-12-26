@@ -8,9 +8,9 @@ class UserService {
 	static async readAll() {
 		try {
 			const findUser = await UserModel.findAll({
-				order: [["username", "ASC"]],
+				order: [["name", "ASC"]],
 				raw: true,
-				attributes: ["username"],
+				attributes: ["name", "email", "role"],
 			});
 
 			return findUser;
@@ -19,12 +19,12 @@ class UserService {
 		}
 	}
 
-	static async readOne(username) {
+	static async readOne(name) {
 		try {
 			const findUser = await UserModel.findOne({
-				where: { username: username },
+				where: { name: name },
 				raw: true,
-				attributes: ["user_id", "username", "password"],
+				attributes: ["user_id", "name", "password"],
 			});
 
 			return findUser;
@@ -40,7 +40,8 @@ class UserService {
 
 			const createUser = await UserModel.create(
 				{
-					username: dataUser.username,
+					name: dataUser.name,
+					email: dataUser.email,
 					password: dataUser.password,
 				},
 				{ transaction }

@@ -1,6 +1,6 @@
 const { UserService } = require("../services/UserService");
 const { Validator } = require("../utils/validators");
-const { PasswordManager } = require("../middlewares/Authentication");
+const { Authentication } = require("../middlewares/Authentication");
 const { Authorization } = require("../middlewares/Authorization");
 
 class UserController {
@@ -31,7 +31,7 @@ class UserController {
 				throw newError;
 			}
 
-			const isMatch = await PasswordManager.decryption(
+			const isMatch = await Authentication.decryption(
 				findUser.password,
 				req.body.password
 			);
@@ -55,7 +55,7 @@ class UserController {
 
 	static async signup(req, res) {
 		try {
-			let { error } = Validator.signinSignup(req.body);
+			let { error } = Validator.signup(req.body);
 
 			if (error) {
 				const newError = new Error(error.details[0].message);
@@ -63,17 +63,15 @@ class UserController {
 				throw newError;
 			}
 
-			const findUser = await UserService.readOne(req.body.username);
+			const findUser = await UserService.readOne(req.body.email);
 
 			if (findUser) {
-				const newError = new Error(`Username sudah terdaftar.`);
+				const newError = new Error(`email sudah terdaftar.`);
 				newError.status = 400;
 				throw newError;
 			}
 
-			const hashedPassword = await PasswordManager.encryption(
-				req.body.password
-			);
+			const hashedPassword = await Authentication.encryption(req.body.password);
 
 			req.body.password = hashedPassword;
 
@@ -104,9 +102,7 @@ class UserController {
 				throw newError;
 			}
 
-			const hashedPassword = await PasswordManager.encryption(
-				req.body.password
-			);
+			const hashedPassword = await Authentication.encryption(req.body.password);
 
 			req.body.password = hashedPassword;
 

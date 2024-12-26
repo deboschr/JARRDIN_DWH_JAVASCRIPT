@@ -9,6 +9,15 @@ const userSchema = {
 
 		return schema.validate(user, { abortEarly: false });
 	},
+	signup(user) {
+		const schema = Joi.object({
+			name: Joi.string().max(200).required(),
+			email: Joi.string().max(200).email().required(),
+			password: Joi.string().min(8).max(200).pattern(/^\S+$/).required(),
+		}).required();
+
+		return schema.validate(user, { abortEarly: false });
+	},
 };
 
 module.exports = { userSchema };
