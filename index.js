@@ -19,7 +19,7 @@ async function initializeApp() {
 	// Inisialisasi DatabaseManager dan koneksi database
 	new DatabaseManager();
 	await DatabaseManager.authenticate();
-	// DatabaseManager.synchronize((isForce = false));
+	DatabaseManager.synchronize((isForce = false));
 
 	// const { JobService } = require("./services/JobService.js");
 	// await JobService.read((isReload = true));

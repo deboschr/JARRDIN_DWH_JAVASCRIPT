@@ -9,7 +9,11 @@ const UserModel = DataWarehouseDB.define(
 			primaryKey: true,
 			autoIncrement: true,
 		},
-		username: {
+		name: {
+			type: DataTypes.STRING(200),
+			allowNull: false,
+		},
+		email: {
 			type: DataTypes.STRING(200),
 			allowNull: false,
 		},
