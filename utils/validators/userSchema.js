@@ -1,18 +1,10 @@
 const Joi = require("joi");
 
 const userSchema = {
-	loginRegister(user) {
+	signin(user) {
 		const schema = Joi.object({
-			username: Joi.string()
-				.max(200)
-				.trim()
-				.pattern(/^\S+$/) // memastikan tidak ada spasi di username
-				.required(),
-			password: Joi.string()
-				.min(8)
-				.max(200)
-				.pattern(/^\S+$/) // memastikan tidak ada spasi di password
-				.required(),
+			email: Joi.string().max(200).email().required(),
+			password: Joi.string().min(8).max(200).pattern(/^\S+$/).required(),
 		}).required();
 
 		return schema.validate(user, { abortEarly: false });

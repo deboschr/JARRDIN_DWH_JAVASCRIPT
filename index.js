@@ -2,6 +2,7 @@ const express = require("express");
 const dotenv = require("dotenv");
 const expressLayouts = require("express-ejs-layouts");
 
+// Configure environment variables at the very start
 dotenv.config();
 
 const app = express();
@@ -19,7 +20,7 @@ app.use(express.urlencoded({ extended: true }));
 const DatabaseConnection = require("./config/DatabaseConnection");
 DatabaseConnection.authenticate()
 	.then(() => {
-		DatabaseConnection.synchronize().then(async () => {
+		DatabaseConnection.synchronize(true).then(async () => {
 			// const { JobService } = require("./services/JobService.js");
 			// await JobService.read(true);
 
