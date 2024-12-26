@@ -1,0 +1,9 @@
+PORT = 3000
+
+SECRET_KEY = B2Pf4PJgqO+7FoUC7BMV59qnNG63KLZcdVlTa7YZGgpKZN3/Gj/UDsm36095KwTUMKOxF8msvSJy8+Uef5OSf8I6V3ybUx69YqnLptH65+pNxRH8D683hoBDtIP1MBmXbWA5TJwNyDnFX4t/sH1LEApfHroGCtlj4dDrkZwlacY
+
+DB_HOST = jadiin-developer.com
+DB_DIAL = mysql
+DB_NAME = jadiinde_jarrdin_dwh
+DB_USER = jadiinde_jarrdin_dwh
+DB_PASS = pNLFEcntrzS98xSpJec7

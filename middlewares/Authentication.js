@@ -1,6 +1,6 @@
 const crypto = require("crypto");
 
-class PasswordManager {
+class Authentication {
 	static async encryption(plainPassword) {
 		const salt = crypto.randomBytes(16); // 16 bytes salt
 		const keylen = 64; // Output length in bytes
@@ -58,4 +58,4 @@ class PasswordManager {
 	}
 }
 
-module.exports = { PasswordManager };
+module.exports = { Authentication };

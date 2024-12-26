@@ -1,6 +1,6 @@
 const { UserService } = require("../services/UserService");
 const { Validator } = require("../utils/validators");
-const { PasswordManager } = require("../utils/PasswordManager");
+const { PasswordManager } = require("../middlewares/Authentication");
 const { Authorization } = require("../middlewares/Authorization");
 
 class UserController {
