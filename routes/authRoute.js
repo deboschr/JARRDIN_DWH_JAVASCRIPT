@@ -4,9 +4,9 @@ const router = express.Router();
 const { UserController } = require("../controllers/UserConstroller");
 const { Authorization } = require("../middlewares/Authorization");
 
-router.get("/", UserController.authPage);
-router.post("/signin", UserController.signin);
-router.post("/signup", UserController.signup);
-router.post("/signout", Authorization.decryption, UserController.signout);
+router.get("/v1", UserController.authPage);
+router.post("/v1/signin", UserController.signin);
+router.post("/v1/signup", UserController.signup);
+router.post("/v1/signout", Authorization.decryption, UserController.signout);
 
 module.exports = router;

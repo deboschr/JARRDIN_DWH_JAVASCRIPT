@@ -21,12 +21,15 @@ class Authorization {
 	static async decryption(req, res, next) {
 		try {
 			const token = req.headers["token"];
+			const dataSession = req.session.dataSession;
 
-			if (!token) {
-				return res.redirect("/user/signin");
+			if (token) {
+				req.dataSession = jwt.verify(token, process.env.SECRET_KEY);
+			} else if (dataSession) {
+				req.dataSession = dataSession;
+			} else {
+				return res.redirect("/auth/v1");
 			}
-
-			req.dataSession = jwt.verify(token, process.env.SECRET_KEY);
 
 			next();
 		} catch (error) {

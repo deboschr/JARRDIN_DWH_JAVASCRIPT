@@ -6,7 +6,7 @@ const userRoute = require("./userRoute");
 const jobRoute = require("./jobRoute");
 
 router.get("/", (req, res) => {
-	res.redirect("/auth");
+	res.redirect("/auth/v1");
 });
 
 router.use("/auth", authRoute);

@@ -15,7 +15,7 @@ class UserController {
 
 	static async signin(req, res) {
 		try {
-			let { error } = Validator.signinSignup(req.body);
+			let { error } = Validator.signin(req.body);
 
 			if (error) {
 				const newError = new Error(error.details[0].message);
@@ -23,10 +23,10 @@ class UserController {
 				throw newError;
 			}
 
-			const findUser = await UserService.readOne(req.body.username);
+			const findUser = await UserService.readOne(req.body.email);
 
 			if (!findUser) {
-				const newError = new Error(`Username salah.`);
+				const newError = new Error(`Email salah.`);
 				newError.status = 400;
 				throw newError;
 			}
@@ -42,11 +42,13 @@ class UserController {
 				throw newError;
 			}
 
+			delete findUser.password;
 			const token = await Authorization.encryption(findUser);
 
-			res.set("Token", `Bearer ${token}`);
+			res.set("token", `Bearer ${token}`);
+			req.session.dataSession = findUser;
 
-			res.status(200).json({ success: true });
+			res.status(200).json({ success: true, data: findUser });
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });

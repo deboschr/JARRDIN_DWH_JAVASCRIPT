@@ -1,4 +1,5 @@
 const express = require("express");
+const session = require("express-session");
 const dotenv = require("dotenv");
 const expressLayouts = require("express-ejs-layouts");
 
@@ -10,6 +11,14 @@ const PORT = process.env.PORT || 3000;
 app.set("view engine", "ejs");
 app.set("views", "views");
 
+app.use(
+	session({
+		secret: process.env.SECRET_KEY,
+		resave: false,
+		saveUninitialized: true,
+		// cookie: { secure: true },
+	})
+);
 app.use(express.static("public"));
 app.use(expressLayouts);
 app.use(express.json());
@@ -21,7 +30,7 @@ DatabaseConnection.authenticate()
 		const routes = require("./routes");
 		app.use("/", routes);
 
-		await DatabaseConnection.synchronize();
+		// await DatabaseConnection.synchronize();
 
 		app.listen(PORT, () => {
 			console.log(`>> Server is running on http://localhost:${PORT}`);

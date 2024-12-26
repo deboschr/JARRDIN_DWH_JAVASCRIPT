@@ -19,12 +19,12 @@ class UserService {
 		}
 	}
 
-	static async readOne(name) {
+	static async readOne(email) {
 		try {
 			const findUser = await UserModel.findOne({
-				where: { name: name },
+				where: { email: email },
 				raw: true,
-				attributes: ["user_id", "name", "password"],
+				attributes: ["user_id", "name", "email", "password"],
 			});
 
 			return findUser;
