@@ -16,27 +16,20 @@ app.use(expressLayouts);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Initialize the database connection
-const DatabaseConnection = require("./config/DatabaseConnection");
-DatabaseConnection.authenticate()
+const MyDB = require("./models/index");
+
+MyDB.sync({ alter: true })
 	.then(() => {
-		DatabaseConnection.synchronize(true).then(async () => {
+		app.listen(PORT, async () => {
 			// const { JobService } = require("./services/JobService.js");
 			// await JobService.read(true);
 
-			const routes = require("./routes");
-			app.use("/", routes);
+			// const routes = require("./routes");
+			// app.use("/", routes);
 
-			app.listen(PORT, () => {
-				console.log(`>> Server is running on http://localhost:${PORT}`);
-			});
+			console.log(`>> Server running at http://localhost:${PORT}`);
 		});
 	})
 	.catch((err) => {
-		console.error("Failed to connect to the database or synchronize it:", err);
+		console.error("Failed to sync database:", err);
 	});
-
-// It's useful to handle possible errors when starting the server
-app.on("error", (error) => {
-	console.error(`Error occurred starting the server: ${error.message}`);
-});

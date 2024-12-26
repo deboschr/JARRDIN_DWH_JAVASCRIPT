@@ -1,5 +1,4 @@
-const DatabaseConnection = require("../config/DatabaseConnection.js");
-const MyDB = DatabaseConnection.getConnection();
+const MyDB = require("./index");
 const { DataTypes } = require("sequelize");
 
 const UserModel = MyDB.define(
