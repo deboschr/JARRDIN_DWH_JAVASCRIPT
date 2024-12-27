@@ -81,7 +81,7 @@ class JobService {
 
 			if (error instanceof Sequelize.UniqueConstraintError) {
 				const newError = new Error(error.errors[0].message);
-				newError.status = 400;
+				newError.code = 400;
 				throw newError;
 			}
 

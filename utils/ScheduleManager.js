@@ -7,42 +7,26 @@ class ScheduleManager {
 
 	static createTask(dataJob) {
 		try {
-			if (this.JOBS[dataJob.name]) {
-				console.log(`>> Job ${dataJob.name} sedang running.`);
-				return;
+			if (schedule.scheduledJobs[dataJob.name]) {
+				const newError = new Error(
+					`Job with name ${dataJob.name} already exists`
+				);
+				newError.code = 409;
+				throw newError;
 			}
 
-			let rule = new schedule.RecurrenceRule();
+			const job = schedule.scheduleJob(dataJob.name, dataJob.cron, async () => {
+				try {
+					await etl(dataJob);
 
-			// Parsing waktu jika periode bukan MINUTE atau HOUR
-			if (dataJob.period !== "MINUTE" && dataJob.period !== "HOUR") {
-				const [hour, minute, second] = dataJob.time.split(":").map(Number);
-				rule.hour = hour;
-				rule.minute = minute;
-				rule.second = second;
-			}
-
-			switch (dataJob.period) {
-				case "MINUTE":
-					rule.minute = new schedule.Range(0, 59, dataJob.step);
-					break;
-				case "HOUR":
-					rule.hour = new schedule.Range(0, 23, dataJob.step);
-					break;
-				case "DAY":
-					rule.dayOfWeek = new schedule.Range(0, 6, dataJob.step);
-					break;
-				case "MONTH":
-					rule.month = new schedule.Range(0, 11, dataJob.step);
-					break;
-				case "YEAR":
-					rule.year = new Date().getFullYear() + dataJob.step;
-					break;
-				default:
-					throw new Error(
-						"Invalid period. Must be 'MINUTE', 'HOUR', 'DAY', 'MONTH', or 'YEAR'."
+					const currDate = new Date().toLocaleString();
+					console.log(`Job ${dataJob.name} selesai pada ${currDate}`);
+				} catch (etlError) {
+					console.error(
+						`Error dalam ETL untuk job ${dataJob.name}: ${etlError.message}`
 					);
-			}
+				}
+			});
 
 			// Menjadwalkan job
 			const newJob = schedule.scheduleJob(dataJob.name, rule, async () => {
