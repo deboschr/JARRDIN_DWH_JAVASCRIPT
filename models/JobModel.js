@@ -15,16 +15,8 @@ const JobModel = MyDB.define(
 			allowNull: false,
 			unique: true,
 		},
-		time: {
-			type: DataTypes.TIME,
-			allowNull: true,
-		},
-		step: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-		},
-		period: {
-			type: DataTypes.ENUM("MINUTE", "HOUR", "DAY", "MONTH", "YEAR"),
+		cron: {
+			type: DataTypes.STRING(50),
 			allowNull: false,
 		},
 		count: {
@@ -32,7 +24,7 @@ const JobModel = MyDB.define(
 			defaultValue: 0,
 			allowNull: false,
 		},
-		source_name: {
+		source_db: {
 			type: DataTypes.STRING(100),
 			allowNull: false,
 		},
@@ -40,7 +32,7 @@ const JobModel = MyDB.define(
 			type: DataTypes.JSON,
 			allowNull: true,
 		},
-		destination_name: {
+		destination_db: {
 			type: DataTypes.STRING(100),
 			allowNull: false,
 		},
@@ -50,6 +42,10 @@ const JobModel = MyDB.define(
 		},
 		duplicate_keys: {
 			type: DataTypes.JSON,
+			allowNull: true,
+		},
+		transform_script: {
+			type: DataTypes.TEXT,
 			allowNull: true,
 		},
 		status: {

@@ -28,11 +28,11 @@ class JobService {
 					period: item.period,
 					count: item.count,
 					last_execute: item.updated_at,
-					source_name: item.source_name,
+					source_db: item.source_db,
 					source_tables: item.source_tables
 						? JSON.parse(item.source_tables)
 						: null,
-					destination_name: item.destination_name,
+					destination_db: item.destination_db,
 					destination_tables: item.destination_tables
 						? JSON.parse(item.destination_tables)
 						: null,
@@ -60,9 +60,9 @@ class JobService {
 					time: dataJob.time,
 					step: dataJob.step,
 					period: dataJob.period,
-					source_name: dataJob.source_name,
+					source_db: dataJob.source_db,
 					source_tables: dataJob.source_tables,
-					destination_name: dataJob.destination_name,
+					destination_db: dataJob.destination_db,
 					destination_tables: dataJob.destination_tables,
 					duplicate_keys: dataJob.duplicate_keys,
 					updated_at: dataJob.last_execute,
