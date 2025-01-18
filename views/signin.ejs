@@ -19,8 +19,12 @@
 					<input type="password" id="password" name="password" required />
 				</div>
 				<button type="submit" class="signin-button">Sign In</button>
+
 				<!-- Penambahan div untuk status message -->
-				<div id="statusMessage" style="color: red; margin-top: 10px"></div>
+				<div id="alert-box" class="alert hidden">
+					<p id="alert-message"></p>
+					<button onclick="hideAlert()">Close</button>
+				</div>
 			</form>
 		</div>
 		<script src="/js/signin.js"></script>

@@ -46,3 +46,35 @@ input[type="password"] {
 .signin-button:hover {
 	background-color: #0056b3;
 }
+
+.alert {
+	padding: 20px;
+	background-color: #f44336; /* Red */
+	color: white;
+	border-radius: 5px;
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	z-index: 1000;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	transition: all 0.3s ease;
+}
+
+.alert.hidden {
+	opacity: 0;
+	visibility: hidden;
+	transform: scale(0.9);
+}
+
+.alert p {
+	margin: 0;
+}
+
+.alert button {
+	margin-left: 15px;
+	border: none;
+	background-color: transparent;
+	color: white;
+	cursor: pointer;
+	font-size: 16px;
+}
