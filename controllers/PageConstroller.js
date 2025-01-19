@@ -1,4 +1,5 @@
 const { JobService } = require("../services/JobService");
+const { UserService } = require("../services/UserService");
 
 class PageController {
 	static async signin(req, res) {
@@ -60,9 +61,16 @@ class PageController {
 
 	static async profile(req, res) {
 		try {
+			console.log(req.dataSession);
+
+			const dataUser = await UserService.findUser({
+				user_id: req.dataSession.user_id,
+			});
+
 			res.status(200).render("profile", {
 				page: "profile",
 				layout: "layouts/main",
+				dataUser: dataUser,
 			});
 		} catch (error) {
 			console.error(error);

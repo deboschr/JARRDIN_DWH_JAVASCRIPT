@@ -10,7 +10,7 @@ class UserRepository {
 			const findUser = await UserModel.findAll({
 				order: [["name", "ASC"]],
 				raw: true,
-				attributes: ["name", "email", "role"],
+				attributes: ["name", "email", "status"],
 			});
 
 			return findUser;
@@ -33,12 +33,12 @@ class UserRepository {
 		}
 	}
 
-	static async readOneById(email) {
+	static async readOneById(user_id) {
 		try {
 			const findUser = await UserModel.findOne({
-				where: { email: email },
+				where: { user_id: user_id },
 				raw: true,
-				attributes: ["user_id", "name", "email", "password"],
+				attributes: ["user_id", "name", "email", "status"],
 			});
 
 			return findUser;
@@ -77,6 +77,41 @@ class UserRepository {
 		}
 	}
 
+	static async update(dataUser) {
+		let transaction;
+		try {
+			transaction = await MyDB.transaction();
+
+			const findUser = await UserModel.findOne({
+				where: { user_id: dataUser.user_id },
+			});
+
+			if (!findUser) {
+				const newError = new Error(`User not found.`);
+				newError.status = 404;
+				throw newError;
+			}
+
+			await findUser.update(
+				{
+					name: dataUser.name || findUser.name,
+					email: dataUser.email || findUser.email,
+					password: dataUser.password || findUser.password,
+					status: dataUser.status || findUser.status,
+				},
+				{ transaction }
+			);
+
+			await transaction.commit();
+
+			return findUser;
+		} catch (error) {
+			if (transaction) await transaction.rollback();
+
+			throw error;
+		}
+	}
+
 	static async delete(userId) {
 		let transaction;
 		try {
@@ -87,7 +122,9 @@ class UserRepository {
 			});
 
 			if (!findUser) {
-				throw new Error(`User tidak ditemukan.`);
+				const newError = new Error(`User not found.`);
+				newError.status = 404;
+				throw newError;
 			}
 
 			// Menghapus User dari database

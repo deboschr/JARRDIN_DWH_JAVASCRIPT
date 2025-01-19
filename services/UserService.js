@@ -25,13 +25,50 @@ class UserService {
 			}
 
 			delete findUser.password;
-			
+
 			const token = await Authorization.encryption(findUser);
 
 			return {
 				payload: findUser,
 				token: token,
 			};
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	static async findUser(identifier) {
+		try {
+			let findUser;
+			if (identifier.email) {
+				findUser = await UserRepository.readOneByEmail(identifier.email);
+			} else if (identifier.user_id) {
+				findUser = await UserRepository.readOneById(identifier.user_id);
+			} else {
+				findUser = await UserRepository.readAll();
+			}
+
+			if (!findUser) {
+				const newError = new Error(`User not found.`);
+				newError.status = 404;
+				throw newError;
+			}
+
+			return findUser;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	static async updateUser(dataUser) {
+		try {
+			if (dataUser.password) {
+				dataUser.password = await Authentication.encryption(dataUser.password);
+			}
+
+			const updatedUser = await UserRepository.update(dataUser);
+
+			return updatedUser;
 		} catch (error) {
 			throw error;
 		}

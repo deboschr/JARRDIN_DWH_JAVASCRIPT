@@ -1,42 +1,68 @@
-/* index.css */
+/* Mengatur tampilan dasar halaman */
 body,
-h1,
-h2,
-h3,
-p,
-ul,
-li,
-figure,
-figcaption,
-blockquote,
-dl,
-dd {
+html {
 	margin: 0;
 	padding: 0;
+	width: 100%;
+	height: 100%;
+	font-family: Arial, sans-serif; /* Menggunakan Arial sebagai font dasar */
+}
+
+/* Mengatur container utama */
+#main-container {
+	display: flex;
+	flex-direction: column; /* Menempatkan navbar di atas dan konten di bawah */
+	min-height: 100vh; /* Mengisi setidaknya seluruh tinggi layar */
+	align-items: stretch; /* Membuat elemen anak memenuhi lebar container */
+}
+
+/* Mengatur konten */
+#content-container {
+	background-color: rgb(233, 233, 233);
+	flex-grow: 1; /* Mengambil ruang tersisa setelah navbar */
+	padding: 20px; /* Padding sekitar konten */
+	/* background-color: #f4f4f4; Warna latar belakang abu-abu muda */
+}
+
+/* Mengatur navbar */
+#navbar-container {
+	display: flex;
+	background-color: #333;
+	justify-content: flex-end; /* Elemen-elemen diletakkan di ujung kanan */
+	color: white;
+	height: 60px;
+	align-items: center;
+	width: 100%;
+	/* padding: 10px 20px; */
+}
+
+.nav-list {
 	list-style: none;
+	display: flex;
+	margin: 0 40px; /* Adjusted margin for overall nav-list */
+	padding: 0;
 }
 
-body {
-	font-family: Arial, sans-serif;
-	line-height: 1.6;
-	color: #333;
-}
-
-a {
-	color: #0077cc;
+.nav-link {
+	color: white;
+	padding: 12px 30px; /* Increased padding for individual links */
 	text-decoration: none;
+	transition: color 0.3s, border-bottom 0.3s;
+	font-size: 18px; /* Ukuran font yang lebih besar */
 }
 
-a:hover {
-	text-decoration: underline;
+.nav-link:hover,
+.nav-link.active {
+	color: #f4f4f4;
+	border-bottom: 3px solid #f4f4f4;
 }
 
-#navbar {
-	background-color: #f4f4f4;
-	padding: 10px 0;
-	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* Menambahkan margin pada setiap li untuk memperluas jarak */
+.nav-list li {
+	margin-right: 20px; /* Tambahkan margin kanan untuk setiap item */
 }
 
-#navbar nav a {
-	margin: 0 20px;
+/* Menghapus margin kanan pada item terakhir untuk konsistensi */
+.nav-list li:last-child {
+	margin-right: 0;
 }

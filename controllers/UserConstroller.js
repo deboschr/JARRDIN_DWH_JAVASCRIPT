@@ -112,9 +112,22 @@ class UserController {
 
 	static async update(req, res) {
 		try {
-			const deleteUser = await UserService.delete(req.params.id);
+			const updateData = {
+				...req.body,
+				user_id: req.params.id,
+			};
 
-			res.status(200).json({ success: true });
+			let { error } = Validator.updateUser(updateData);
+
+			if (error) {
+				const newError = new Error(error.details[0].message);
+				newError.status = 400;
+				throw newError;
+			}
+
+			const updatedUser = await UserService.updateUser(updateData);
+
+			res.status(200).json({ success: true, data: updatedUser });
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });

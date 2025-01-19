@@ -27,7 +27,8 @@ router.get(
 );
 router.get(
 	"/profile",
-	// Authorization.decryption,
+	//
+	Authorization.decryption,
 	PageController.profile
 );
 

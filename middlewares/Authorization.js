@@ -28,7 +28,7 @@ class Authorization {
 			} else if (dataSession) {
 				req.dataSession = dataSession;
 			} else {
-				return res.redirect("/auth/v1");
+				return res.redirect("/page/v1/signin");
 			}
 
 			next();
