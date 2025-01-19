@@ -49,32 +49,22 @@ input[type="password"] {
 
 .alert {
 	padding: 20px;
-	background-color: #f44336; /* Red */
-	color: white;
-	border-radius: 5px;
+	background-color: #f44336; /* Red background */
+	color: white; /* White text color */
+	border-radius: 5px; /* Rounded corners */
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow */
+
 	position: fixed;
-	top: 20px;
-	right: 20px;
-	z-index: 1000;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-	transition: all 0.3s ease;
+	top: 50%; /* Center vertically */
+	left: 50%; /* Center horizontally */
+	transform: translate(-50%, -50%); /* Adjust position to exact center */
+	z-index: 1000; /* Ensure it's above other content */
+
+	width: 80%; /* Optional: Adjust width as necessary */
+	max-width: 500px; /* Optional: Set a max-width for larger screens */
+	display: none; /* Start hidden */
 }
 
 .alert.hidden {
-	opacity: 0;
-	visibility: hidden;
-	transform: scale(0.9);
-}
-
-.alert p {
-	margin: 0;
-}
-
-.alert button {
-	margin-left: 15px;
-	border: none;
-	background-color: transparent;
-	color: white;
-	cursor: pointer;
-	font-size: 16px;
+	display: none; /* Keep hidden when not in use */
 }

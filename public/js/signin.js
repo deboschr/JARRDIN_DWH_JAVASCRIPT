@@ -32,9 +32,9 @@ async function handleSignInSubmit(event) {
 			const text = await response.text();
 			try {
 				const data = JSON.parse(text);
-				showAlert(`Error: ${data.error || text}`);
+				showAlert(`${data.error || text}`);
 			} catch {
-				showAlert(`Error: ${response.statusText} (Status ${response.status})`);
+				showAlert(`${response.statusText} (Status ${response.status})`);
 			}
 			return;
 		}
@@ -43,7 +43,7 @@ async function handleSignInSubmit(event) {
 		handleSuccessfulSignIn(data);
 	} catch (error) {
 		console.error("Error:", error);
-		showAlert(`Error: ${error.toString()}`);
+		showAlert(error.toString());
 	}
 }
 
@@ -53,21 +53,18 @@ function handleSuccessfulSignIn(data) {
 	window.location.href = "/dashboard"; // Redirect to the dashboard
 }
 
-function handleSignInError(data) {
-	showAlert(`Error: ${data.error}`);
-}
-
 function showAlert(message) {
 	const alertBox = document.getElementById("alert-box");
 	const alertMessage = document.getElementById("alert-message");
 	alertMessage.textContent = message;
-	alertBox.classList.remove("hidden");
+	alertBox.style.display = "block"; // Show the alert box
 
 	setTimeout(() => {
 		hideAlert();
-	}, 5000); // The alert box will disappear after 5 seconds
+	}, 5000); // Automatically hide the alert after 5 seconds
 }
 
 function hideAlert() {
-	document.getElementById("alert-box").classList.add("hidden");
+	const alertBox = document.getElementById("alert-box");
+	alertBox.style.display = "none"; // Hide the alert box
 }
