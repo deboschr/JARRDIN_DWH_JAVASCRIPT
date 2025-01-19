@@ -1,8 +1,10 @@
 const express = require("express");
 const router = express.Router();
 
-const { PageController } = require("../controllers/PageConstroller");
-const { Authorization } = require("../middlewares/Authorization");
+const { PageController } = require("../src/controllers/PageConstroller");
+const {
+	Authorization,
+} = require("../src/controllers/middlewares/Authorization");
 
 router.get("/signin", PageController.signin);
 router.get("/signup", PageController.signup);

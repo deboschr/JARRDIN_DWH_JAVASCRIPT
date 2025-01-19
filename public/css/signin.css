@@ -10,9 +10,10 @@ body {
 
 .signin-container {
 	background: white;
-	padding: 20px;
+	padding: 40px;
 	border-radius: 5px;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+	min-width: 350px;
 }
 
 .form-group {
@@ -45,6 +46,10 @@ input[type="password"] {
 
 .signin-button:hover {
 	background-color: #0056b3;
+}
+
+h2 {
+	text-align: center; /* Menambahkan ini untuk memusatkan judul */
 }
 
 .alert {

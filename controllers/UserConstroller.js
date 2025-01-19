@@ -1,18 +1,9 @@
-const { UserService } = require("../services/UserService");
-const { Validator } = require("../utils/validators");
-const { Authentication } = require("../middlewares/Authentication");
-const { Authorization } = require("../middlewares/Authorization");
+const { UserService } = require("../../services/UserService");
+const { Validator } = require("../../utils/validators");
+const { Authentication } = require("./middlewares/Authentication");
+const { Authorization } = require("./middlewares/Authorization");
 
 class UserController {
-	static async authPage(req, res) {
-		try {
-			res.render("signin", { layout: false });
-		} catch (error) {
-			console.error(error);
-			res.status(error.status || 500).json({ error: error.message });
-		}
-	}
-
 	static async signin(req, res) {
 		try {
 			let { error } = Validator.signin(req.body);
@@ -23,7 +14,7 @@ class UserController {
 				throw newError;
 			}
 
-			const findUser = await UserService.readOne(req.body.email);
+			const findUser = await UserService.signin(req.body.email);
 
 			if (!findUser) {
 				const newError = new Error(`Email salah.`);

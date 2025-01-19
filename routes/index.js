@@ -12,7 +12,7 @@ router.get("/", (req, res) => {
 
 router.use("/page/:version", pageRoute);
 
-// router.use("/api/:version/user", userRoute);
+router.use("/api/:version/user", userRoute);
 // router.use("/api/:version/dbconfig", dbConfigRoute);
 // router.use("/api/:version/job", jobRoute);
 
