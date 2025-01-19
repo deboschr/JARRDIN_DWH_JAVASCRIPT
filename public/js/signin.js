@@ -28,6 +28,8 @@ async function handleSignInSubmit(event) {
 		});
 
 		if (!response.ok) {
+			console.log(response);
+
 			// Coba parse respons sebagai JSON jika mungkin, jika tidak, gunakan status text
 			const text = await response.text();
 			try {

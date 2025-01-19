@@ -5,7 +5,7 @@ const { Sequelize } = require("sequelize");
 const { JobModel } = require("../models/JobModel.js");
 const { ScheduleManager } = require("../utils/ScheduleManager.js");
 
-class JobService {
+class JobRepository {
 	static async read(isReload = false) {
 		try {
 			const findJob = await JobModel.findAll({
@@ -177,4 +177,4 @@ class JobService {
 	}
 }
 
-module.exports = { JobService };
+module.exports = { JobRepository };

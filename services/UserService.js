@@ -1,90 +1,38 @@
-const DatabaseConnection = require("../config/DatabaseConnection.js");
-const MyDB = DatabaseConnection.getConnection();
-const { Sequelize } = require("sequelize");
-
-const { UserModel } = require("../models/UserModel");
+const { UserRepository } = require("../repositories/UserRepository.js");
+const { Authentication } = require("../middlewares/Authentication");
+const { Authorization } = require("../middlewares/Authorization");
 
 class UserService {
-	static async readAll() {
+	static async signin(dataUser) {
 		try {
-			const findUser = await UserModel.findAll({
-				order: [["name", "ASC"]],
-				raw: true,
-				attributes: ["name", "email", "role"],
-			});
+			const findUser = await UserRepository.readOneByEmail(dataUser.email);
 
-			return findUser;
-		} catch (error) {
-			throw error;
-		}
-	}
-
-	static async readOne(email) {
-		try {
-			const findUser = await UserModel.findOne({
-				where: { email: email },
-				raw: true,
-				attributes: ["user_id", "name", "email", "password"],
-			});
-
-			return findUser;
-		} catch (error) {
-			throw error;
-		}
-	}
-
-	static async create(dataUser) {
-		let transaction;
-		try {
-			transaction = await MyDB.transaction();
-
-			const createUser = await UserModel.create(
-				{
-					name: dataUser.name,
-					email: dataUser.email,
-					password: dataUser.password,
-				},
-				{ transaction }
-			);
-
-			await transaction.commit();
-
-			return createUser;
-		} catch (error) {
-			if (transaction) await transaction.rollback();
-
-			if (error instanceof Sequelize.UniqueConstraintError) {
-				const newError = new Error(error.errors[0].message);
+			if (!findUser) {
+				const newError = new Error(`Email salah.`);
 				newError.status = 400;
 				throw newError;
 			}
 
-			throw error;
-		}
-	}
+			const isMatch = await Authentication.decryption(
+				findUser.password,
+				dataUser.password
+			);
 
-	static async delete(userId) {
-		let transaction;
-		try {
-			transaction = await MyDB.transaction();
-
-			const findUser = await UserModel.finOne({
-				where: { user_id: userId },
-			});
-
-			if (!findUser) {
-				throw new Error(`User tidak ditemukan.`);
+			if (!isMatch) {
+				const newError = new Error(`Password salah.`);
+				newError.status = 400;
+				throw newError;
 			}
 
-			// Menghapus User dari database
-			await findUser.destroy({ transaction });
+			delete findUser.password;
+			
+			const token = await Authorization.encryption(findUser);
 
-			await transaction.commit();
-
-			return findUser;
+			return {
+				payload: findUser,
+				token: token,
+			};
 		} catch (error) {
-			if (transaction) await transaction.rollback();
-
 			throw error;
 		}
 	}

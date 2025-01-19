@@ -1,10 +1,8 @@
 const express = require("express");
 const router = express.Router();
 
-const { JobController } = require("../src/controllers/JobConstroller");
-const {
-	Authorization,
-} = require("../src/controllers/middlewares/Authorization");
+const { JobController } = require("../controllers/JobConstroller");
+const { Authorization } = require("../middlewares/Authorization");
 
 router.use("/", Authorization.decryption);
 

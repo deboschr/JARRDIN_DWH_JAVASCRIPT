@@ -4,7 +4,7 @@ const { Sequelize } = require("sequelize");
 
 const { UserModel } = require("../models/UserModel.js");
 
-class UserService {
+class UserRepository {
 	static async readAll() {
 		try {
 			const findUser = await UserModel.findAll({
@@ -19,7 +19,21 @@ class UserService {
 		}
 	}
 
-	static async readOne(email) {
+	static async readOneByEmail(email) {
+		try {
+			const findUser = await UserModel.findOne({
+				where: { email: email, status: "active" },
+				attributes: ["user_id", "name", "email", "password"],
+				raw: true,
+			});
+
+			return findUser;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	static async readOneById(email) {
 		try {
 			const findUser = await UserModel.findOne({
 				where: { email: email },
@@ -90,4 +104,4 @@ class UserService {
 	}
 }
 
-module.exports = { UserService };
+module.exports = { UserRepository };

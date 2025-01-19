@@ -3,8 +3,8 @@ const router = express.Router();
 
 const pageRoute = require("./pageRoute");
 const userRoute = require("./userRoute");
-const dbConfigRoute = require("./dbConfigRoute");
-const jobRoute = require("./jobRoute");
+// const dbConfigRoute = require("./dbConfigRoute");
+// const jobRoute = require("./jobRoute");
 
 router.get("/", (req, res) => {
 	res.status(200).json("Wellcome to The Jarrdin Data Warehouse");

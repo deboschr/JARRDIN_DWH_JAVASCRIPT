@@ -1,7 +1,7 @@
-const { UserService } = require("../../services/UserService");
-const { Validator } = require("../../utils/validators");
-const { Authentication } = require("./middlewares/Authentication");
-const { Authorization } = require("./middlewares/Authorization");
+const { UserService } = require("../services/UserService");
+const { Validator } = require("../utils/validators");
+const { Authentication } = require("../middlewares/Authentication");
+const { Authorization } = require("../middlewares/Authorization");
 
 class UserController {
 	static async signin(req, res) {
@@ -14,32 +14,12 @@ class UserController {
 				throw newError;
 			}
 
-			const findUser = await UserService.signin(req.body.email);
-
-			if (!findUser) {
-				const newError = new Error(`Email salah.`);
-				newError.status = 400;
-				throw newError;
-			}
-
-			const isMatch = await Authentication.decryption(
-				findUser.password,
-				req.body.password
-			);
-
-			if (!isMatch) {
-				const newError = new Error(`Password salah.`);
-				newError.status = 400;
-				throw newError;
-			}
-
-			delete findUser.password;
-			const token = await Authorization.encryption(findUser);
+			const { payload, token } = await UserService.signin(req.body);
 
 			res.set("token", `Bearer ${token}`);
-			req.session.dataSession = findUser;
+			req.session.dataSession = payload;
 
-			res.status(200).json({ success: true, data: findUser });
+			res.status(200).json({ success: true, data: payload });
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });
@@ -108,7 +88,7 @@ class UserController {
 		}
 	}
 
-	static async userPage(req, res) {
+	static async getAll(req, res) {
 		try {
 			let readUser = await UserService.readAll();
 
