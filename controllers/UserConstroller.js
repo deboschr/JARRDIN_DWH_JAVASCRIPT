@@ -36,21 +36,21 @@ class UserController {
 				throw newError;
 			}
 
-			const findUser = await UserService.readOne(req.body.email);
+			// const findUser = await UserService.readOne(req.body.email);
 
-			if (findUser) {
-				const newError = new Error(`email sudah terdaftar.`);
-				newError.status = 400;
-				throw newError;
-			}
+			// if (findUser) {
+			// 	const newError = new Error(`email sudah terdaftar.`);
+			// 	newError.status = 400;
+			// 	throw newError;
+			// }
 
 			const hashedPassword = await Authentication.encryption(req.body.password);
 
-			req.body.password = hashedPassword;
+			// req.body.password = hashedPassword;
 
-			const createUser = await UserService.create(req.body);
+			// const createUser = await UserService.create(req.body);
 
-			res.status(200).json({ success: true });
+			res.status(200).json({ success: true, password: hashedPassword });
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });

@@ -5,7 +5,7 @@ const { UserController } = require("../controllers/UserConstroller");
 const { Authorization } = require("../middlewares/Authorization");
 
 router.post("/signin", UserController.signin);
-router.post("/signup", Authorization.decryption, UserController.signup);
+router.post("/signup", UserController.signup);
 router.post("/signout", Authorization.decryption, UserController.signout);
 
 router.get("/", Authorization.decryption, UserController.getAll);

@@ -28,9 +28,6 @@ async function handleSignInSubmit(event) {
 		});
 
 		if (!response.ok) {
-			console.log(response);
-
-			// Coba parse respons sebagai JSON jika mungkin, jika tidak, gunakan status text
 			const text = await response.text();
 			try {
 				const data = JSON.parse(text);
@@ -42,17 +39,12 @@ async function handleSignInSubmit(event) {
 		}
 
 		const data = await response.json();
-		handleSuccessfulSignIn(data);
+
+		window.location.href = "/dashboard";
 	} catch (error) {
 		console.error("Error:", error);
 		showAlert(error.toString());
 	}
-}
-
-function handleSuccessfulSignIn(data) {
-	alert("Sign in successful!");
-	localStorage.setItem("token", data.token); // Save the token to localStorage
-	window.location.href = "/dashboard"; // Redirect to the dashboard
 }
 
 function showAlert(message) {
