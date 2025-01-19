@@ -40,7 +40,7 @@ async function handleSignInSubmit(event) {
 
 		const data = await response.json();
 
-		window.location.href = "/dashboard";
+		window.location.href = "/page/v1/dashboard";
 	} catch (error) {
 		console.error("Error:", error);
 		showAlert(error.toString());

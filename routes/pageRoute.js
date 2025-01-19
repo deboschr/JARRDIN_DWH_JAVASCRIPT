@@ -5,10 +5,30 @@ const { PageController } = require("../controllers/PageConstroller");
 const { Authorization } = require("../middlewares/Authorization");
 
 router.get("/signin", PageController.signin);
-router.get("/signup", PageController.signup);
-router.get("/dashboard", Authorization.decryption, PageController.dashboard);
-router.get("/dbconfig", Authorization.decryption, PageController.dbconfig);
-router.get("/job", Authorization.decryption, PageController.job);
-router.get("/profile", Authorization.decryption, PageController.profile);
+router.get(
+	"/dashboard",
+	// Authorization.decryption,
+	PageController.dashboard
+);
+router.get(
+	"/dbconfig",
+	// Authorization.decryption,
+	PageController.dbconfig
+);
+router.get(
+	"/job",
+	// Authorization.decryption,
+	PageController.job
+);
+router.get(
+	"/user",
+	// Authorization.decryption,
+	PageController.user
+);
+router.get(
+	"/profile",
+	// Authorization.decryption,
+	PageController.profile
+);
 
 module.exports = router;
