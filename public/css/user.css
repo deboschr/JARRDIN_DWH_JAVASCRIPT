@@ -40,6 +40,7 @@
 	text-align: center;
 }
 
+/* MODAL */
 .modal {
 	display: none;
 	position: fixed;
@@ -55,38 +56,58 @@
 .modal-content {
 	background-color: #fefefe;
 	margin: 15% auto;
-	padding: 20px;
+	padding: 40px 20px 20px 20px; /* Increased top padding to accommodate the close button */
 	border: 1px solid #888;
 	width: 80%;
 	max-width: 500px;
+	position: relative; /* Allows absolute positioning within */
+	border-radius: 5px;
 }
 
-.form-group {
-	margin-bottom: 10px; /* Adds spacing between form groups */
+.close-button {
+	color: #8b8b8b;
+	position: absolute; /* Position absolutely within the modal */
+	right: 15px; /* Position to the right */
+	top: 5px; /* Position to the top */
+	font-size: 28px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+	color: rgb(255, 0, 0);
+	text-decoration: none;
 }
 
 .modal-form {
 	display: flex;
 	flex-direction: column;
+	background-color: #fefefe;
 }
 
-.modal-form label {
-	margin-bottom: 5px; /* Adds a little space between label and input */
+.form-group {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 20px;
 }
 
-.modal-form input[type="text"],
-.modal-form input[type="email"],
-.modal-form input[type="password"] {
-	width: 100%;
+.form-group label {
+	margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+	width: calc(100% - 16px); /* Adjust width to account for padding */
 	padding: 8px;
-	margin-bottom: 10px; /* Adds spacing below each input */
 	border: 1px solid #ccc;
 	border-radius: 4px;
 }
 
 .modal-actions {
 	display: flex;
-	justify-content: space-between; /* Distributes space evenly between the buttons */
+	justify-content: flex-end;
 }
 
 .modal-actions button {
@@ -96,18 +117,4 @@
 	cursor: pointer;
 	background-color: #007bff;
 	color: white;
-}
-
-.close-button {
-	color: #aaa;
-	float: right;
-	font-size: 28px;
-	font-weight: bold;
-}
-
-.close-button:hover,
-.close-button:focus {
-	color: black;
-	text-decoration: none;
-	cursor: pointer;
 }
