@@ -1,0 +1,85 @@
+<div class="user-container">
+	<button id="newUserButton" class="new-user-button">New User</button>
+	<table class="user-table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Email</th>
+				<th>Status</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<% dataUser.forEach(user => { %>
+			<tr>
+				<td><%= user.name %></td>
+				<td><%= user.email %></td>
+				<td><%= user.status %></td>
+				<td>
+					<button
+						class="update-button"
+						data-userid="<%= user.user_id %>"
+						aria-label="Update user <%= user.name %>">
+						Update
+					</button>
+				</td>
+			</tr>
+			<% }) %>
+		</tbody>
+	</table>
+</div>
+
+<!-- Modal for Creating New User -->
+<div id="createModal" class="modal">
+	<div class="modal-content">
+		<span class="close-button">&times;</span>
+		<form id="createForm" class="modal-form" autocomplete="off">
+			<div class="form-group">
+				<label for="name">Name:</label>
+				<input type="text" id="newName" name="name" required />
+			</div>
+			<div class="form-group">
+				<label for="email">Email:</label>
+				<input type="email" id="newEmail" name="email" required />
+			</div>
+			<div class="form-group">
+				<label for="password">Password:</label>
+				<input type="text" id="newPassword" name="password" required />
+			</div>
+			<div class="modal-actions">
+				<button type="button" id="createButton">Create User</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Modal for User Update -->
+<div id="updateModal" class="modal">
+	<div class="modal-content">
+		<span class="close-button">&times;</span>
+		<form id="updateForm" class="modal-form">
+			<!-- Hidden input for user_id -->
+			<input type="hidden" id="updateUserId" name="userId" />
+
+			<div class="form-group">
+				<label for="name">Name:</label>
+				<input type="text" id="updateName" name="name" required />
+			</div>
+			<div class="form-group">
+				<label for="email">Email:</label>
+				<input type="email" id="updateEmail" name="email" required />
+			</div>
+			<div class="form-group">
+				<label for="status">Status:</label>
+				<select id="updateStatus" name="status" required>
+					<option value="ACTIVE">ACTIVE</option>
+					<option value="INACTIVE">INACTIVE</option>
+				</select>
+			</div>
+			<div class="modal-actions">
+				<button type="button" id="deleteButton">Delete</button>
+				<button type="button" id="saveButton">Save</button>
+			</div>
+		</form>
+	</div>
+</div>

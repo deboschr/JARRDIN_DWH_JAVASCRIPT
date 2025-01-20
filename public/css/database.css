@@ -1,0 +1,153 @@
+.user-container {
+	margin: 20px;
+	position: relative;
+	padding-top: 50px; /* Add space at the top for the button */
+}
+
+.new-user-button {
+	position: absolute;
+	right: 1px;
+	top: 5px; /* Position the button correctly */
+	padding: 10px;
+	background-color: #007bff;
+	color: white;
+	border: none;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+.user-table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.user-table th,
+.user-table td {
+	border: 3px solid #c3c3c3;
+	padding: 8px;
+	text-align: left; /* Default alignment for all cells */
+}
+
+.user-table th {
+	background-color: #007bff;
+	color: white;
+}
+
+/* New styles for aligning Status and Action columns */
+.user-table td:nth-child(3), /* This targets the Status column cells */
+.user-table td:nth-child(4) {
+	/* This targets the Action column cells */
+	text-align: center;
+}
+
+/* MODAL */
+.modal {
+	display: none;
+	position: fixed;
+	z-index: 1;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+	background-color: #fefefe;
+	margin: 15% auto;
+	padding: 40px 20px 20px 20px; /* Increased top padding to accommodate the close button */
+	border: 1px solid #888;
+	width: 80%;
+	max-width: 500px;
+	position: relative; /* Allows absolute positioning within */
+	border-radius: 5px;
+}
+
+.close-button {
+	color: #8b8b8b;
+	position: absolute; /* Position absolutely within the modal */
+	right: 15px; /* Position to the right */
+	top: 5px; /* Position to the top */
+	font-size: 28px;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.close-button:hover,
+.close-button:focus {
+	color: rgb(255, 0, 0);
+	text-decoration: none;
+}
+
+.modal-form {
+	display: flex;
+	flex-direction: column;
+	background-color: #fefefe;
+}
+
+.form-group {
+	display: flex;
+	flex-direction: column;
+	margin-bottom: 20px;
+}
+
+.form-group label {
+	margin-bottom: 5px;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+	width: calc(100% - 16px); /* Adjust width to account for padding */
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.form-group select {
+	padding: 8px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	background-color: white; /* Ensure background matches other inputs */
+	color: black; /* Text color */
+	-moz-appearance: none; /* Remove default styling in Firefox */
+	-webkit-appearance: none; /* Remove default styling in Chrome and Safari */
+	appearance: none; /* Remove default styling */
+}
+
+/* Custom arrow for the select */
+.form-group select {
+	background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%2212%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20400%22%3E%3Cpolygon%20fill%3D%22%23007bff%22%20points%3D%22199.404%2C284.475%20300.181%2C183.698%2098.627%2C183.698%20%22/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 10px center; /* Position the arrow nicely on the right */
+	background-size: 20px 20px; /* Size of the arrow */
+	cursor: pointer; /* Cursor to indicate this is a dropdown */
+}
+
+/* Apply focus style */
+.form-group input:focus,
+.form-group select:focus {
+	outline: none; /* Remove the default focus outline */
+	border-color: #66afe9; /* Focus border color similar to Bootstrap's focus */
+	box-shadow: 0 0 8px rgba(102, 175, 233, 0.6); /* Subtle focus glow */
+}
+
+.modal-actions {
+	display: flex;
+	justify-content: flex-end;
+}
+
+.modal-actions button {
+	padding: 10px 20px;
+	border: none;
+	border-radius: 5px;
+	cursor: pointer;
+	background-color: #007bff;
+	color: white;
+}
+
+#deleteButton {
+	background-color: rgb(248, 74, 74);
+	margin-right: 20px;
+}

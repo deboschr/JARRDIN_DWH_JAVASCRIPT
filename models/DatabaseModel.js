@@ -4,10 +4,10 @@ const { DataTypes } = require("sequelize");
 
 const { UserModel } = require("./UserModel.js");
 
-const DbConfigModel = MyDB.define(
-	"db_config",
+const DatabaseModel = MyDB.define(
+	"database",
 	{
-		db_config_id: {
+		database_id: {
 			type: DataTypes.INTEGER,
 			primaryKey: true,
 			autoIncrement: true,
@@ -50,7 +50,7 @@ const DbConfigModel = MyDB.define(
 		},
 	},
 	{
-		tableName: "db_config",
+		tableName: "database",
 		timestamps: false,
 		hooks: {
 			beforeCreate: (data) => {
@@ -64,8 +64,8 @@ const DbConfigModel = MyDB.define(
 );
 
 (function () {
-	// Relasi DbConfig dan User (creator)
-	DbConfigModel.belongsTo(UserModel, {
+	// Relasi Database dan User (creator)
+	DatabaseModel.belongsTo(UserModel, {
 		foreignKey: "created_by",
 		targetKey: "user_id",
 		onDelete: "RESTRICT",
@@ -73,14 +73,14 @@ const DbConfigModel = MyDB.define(
 		as: "creator",
 	});
 
-	UserModel.hasMany(DbConfigModel, {
+	UserModel.hasMany(DatabaseModel, {
 		foreignKey: "created_by",
 		sourceKey: "user_id",
-		as: "create_db_config",
+		as: "create_database",
 	});
 
-	// Relasi DbConfig dan User (updator)
-	DbConfigModel.belongsTo(UserModel, {
+	// Relasi Database dan User (updator)
+	DatabaseModel.belongsTo(UserModel, {
 		foreignKey: "updated_by",
 		targetKey: "user_id",
 		onDelete: "RESTRICT",
@@ -88,11 +88,11 @@ const DbConfigModel = MyDB.define(
 		as: "updator",
 	});
 
-	UserModel.hasMany(DbConfigModel, {
+	UserModel.hasMany(DatabaseModel, {
 		foreignKey: "updated_by",
 		sourceKey: "user_id",
-		as: "update_db_config",
+		as: "update_database",
 	});
 })();
 
-module.exports = { DbConfigModel };
+module.exports = { DatabaseModel };

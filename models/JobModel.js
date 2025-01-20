@@ -3,7 +3,7 @@ const MyDB = DatabaseConnection.getConnection();
 const { DataTypes } = require("sequelize");
 
 const { UserModel } = require("./UserModel.js");
-const { DbConfigModel } = require("./DbConfigModel.js");
+const { DatabaseModel } = require("./DatabaseModel.js");
 
 const JobModel = MyDB.define(
 	"job",
@@ -105,33 +105,33 @@ const JobModel = MyDB.define(
 		as: "update_job",
 	});
 
-	// Relasi Job dan DbConfig (source_db)
-	JobModel.belongsTo(DbConfigModel, {
+	// Relasi Job dan Database (source_db)
+	JobModel.belongsTo(DatabaseModel, {
 		foreignKey: "source_db_id",
-		targetKey: "db_config_id",
+		targetKey: "database_id",
 		onDelete: "RESTRICT",
 		onUpdate: "CASCADE",
 		as: "source_db",
 	});
 
-	DbConfigModel.hasMany(JobModel, {
+	DatabaseModel.hasMany(JobModel, {
 		foreignKey: "source_db_id",
-		sourceKey: "db_config_id",
+		sourceKey: "database_id",
 		as: "source_job",
 	});
 
-	// Relasi Job dan DbConfig (destination_db)
-	JobModel.belongsTo(DbConfigModel, {
+	// Relasi Job dan Database (destination_db)
+	JobModel.belongsTo(DatabaseModel, {
 		foreignKey: "destination_db_id",
-		targetKey: "db_config_id",
+		targetKey: "database_id",
 		onDelete: "RESTRICT",
 		onUpdate: "CASCADE",
 		as: "destination_db",
 	});
 
-	DbConfigModel.hasMany(JobModel, {
+	DatabaseModel.hasMany(JobModel, {
 		foreignKey: "destination_db_id",
-		sourceKey: "db_config_id",
+		sourceKey: "database_id",
 		as: "destination_job",
 	});
 })();

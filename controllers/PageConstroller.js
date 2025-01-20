@@ -35,10 +35,10 @@ class PageController {
 		}
 	}
 
-	static async dbconfig(req, res) {
+	static async database(req, res) {
 		try {
-			res.status(200).render("dbconfig", {
-				page: "dbconfig",
+			res.status(200).render("database", {
+				page: "database",
 				layout: "layouts/main",
 			});
 		} catch (error) {

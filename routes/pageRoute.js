@@ -11,9 +11,9 @@ router.get(
 	PageController.dashboard
 );
 router.get(
-	"/dbconfig",
+	"/database",
 	// Authorization.decryption,
-	PageController.dbconfig
+	PageController.database
 );
 router.get(
 	"/job",
