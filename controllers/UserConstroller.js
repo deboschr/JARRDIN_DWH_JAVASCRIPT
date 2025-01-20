@@ -36,21 +36,9 @@ class UserController {
 				throw newError;
 			}
 
-			// const findUser = await UserService.readOne(req.body.email);
+			const newUser = await UserService.createUser(req.body);
 
-			// if (findUser) {
-			// 	const newError = new Error(`email sudah terdaftar.`);
-			// 	newError.status = 400;
-			// 	throw newError;
-			// }
-
-			const hashedPassword = await Authentication.encryption(req.body.password);
-
-			// req.body.password = hashedPassword;
-
-			// const createUser = await UserService.create(req.body);
-
-			res.status(200).json({ success: true, password: hashedPassword });
+			res.status(200).json({ success: true, data: newUser });
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });

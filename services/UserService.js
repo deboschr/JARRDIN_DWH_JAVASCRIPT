@@ -40,9 +40,9 @@ class UserService {
 	static async findUser(identifier) {
 		try {
 			let findUser;
-			if (identifier.email) {
+			if (identifier?.email) {
 				findUser = await UserRepository.readOneByEmail(identifier.email);
-			} else if (identifier.user_id) {
+			} else if (identifier?.user_id) {
 				findUser = await UserRepository.readOneById(identifier.user_id);
 			} else {
 				findUser = await UserRepository.readAll();
@@ -55,6 +55,31 @@ class UserService {
 			}
 
 			return findUser;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	static async createUser(dataUser) {
+		try {
+			const findUser = await UserRepository.readOneByEmail(dataUser.email);
+
+			if (findUser) {
+				const newError = new Error(`Email is already registered.`);
+				newError.status = 409;
+				throw newError;
+			}
+
+			dataUser.password = await Authentication.encryption(dataUser.password);
+
+			const newUser = await UserRepository.create(dataUser);
+
+			return {
+				user_id: newUser.user_id,
+				name: newUser.name,
+				email: newUser.email,
+				status: newUser.status,
+			};
 		} catch (error) {
 			throw error;
 		}

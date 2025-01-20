@@ -49,9 +49,12 @@ class PageController {
 
 	static async user(req, res) {
 		try {
+			const dataUser = await UserService.findUser();
+
 			res.status(200).render("user", {
 				page: "user",
 				layout: "layouts/main",
+				dataUser: dataUser,
 			});
 		} catch (error) {
 			console.error(error);
@@ -61,8 +64,6 @@ class PageController {
 
 	static async profile(req, res) {
 		try {
-			console.log(req.dataSession);
-
 			const dataUser = await UserService.findUser({
 				user_id: req.dataSession.user_id,
 			});

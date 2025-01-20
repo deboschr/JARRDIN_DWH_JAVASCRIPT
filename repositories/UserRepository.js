@@ -9,8 +9,8 @@ class UserRepository {
 		try {
 			const findUser = await UserModel.findAll({
 				order: [["name", "ASC"]],
+				attributes: ["user_id", "name", "email", "status"],
 				raw: true,
-				attributes: ["name", "email", "status"],
 			});
 
 			return findUser;
