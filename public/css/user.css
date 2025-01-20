@@ -106,7 +106,6 @@
 }
 
 .form-group select {
-	width: calc(100% - 16px); /* Match width with other inputs */
 	padding: 8px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
@@ -122,11 +121,12 @@
 	background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2212%22%20height%3D%2212%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20400%22%3E%3Cpolygon%20fill%3D%22%23007bff%22%20points%3D%22199.404%2C284.475%20300.181%2C183.698%2098.627%2C183.698%20%22/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-position: right 10px center; /* Position the arrow nicely on the right */
-	background-size: 12px 12px; /* Size of the arrow */
+	background-size: 20px 20px; /* Size of the arrow */
 	cursor: pointer; /* Cursor to indicate this is a dropdown */
 }
 
 /* Apply focus style */
+.form-group input:focus,
 .form-group select:focus {
 	outline: none; /* Remove the default focus outline */
 	border-color: #66afe9; /* Focus border color similar to Bootstrap's focus */
