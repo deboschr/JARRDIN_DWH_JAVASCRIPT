@@ -1,25 +1,29 @@
-<div class="user-container">
-	<button id="newUserButton" class="new-user-button">New User</button>
-	<table class="user-table">
+<div class="database-container">
+	<button id="newDatabaseButton" class="new-database-button">
+		New Database
+	</button>
+	<table class="database-table">
 		<thead>
 			<tr>
-				<th>Name</th>
-				<th>Email</th>
-				<th>Status</th>
+				<th>Database</th>
+				<th>Username</th>
+				<th>Host</th>
+				<th>Port</th>
 				<th>Action</th>
 			</tr>
 		</thead>
 		<tbody>
-			<% dataUser.forEach(user => { %>
+			<% dataDatabase.forEach(database => { %>
 			<tr>
-				<td><%= user.name %></td>
-				<td><%= user.email %></td>
-				<td><%= user.status %></td>
+				<td><%= database.db_name %></td>
+				<td><%= database.username %></td>
+				<td><%= database.host %></td>
+				<td><%= database.port %></td>
 				<td>
 					<button
 						class="update-button"
-						data-userid="<%= user.user_id %>"
-						aria-label="Update user <%= user.name %>">
+						data-databaseid="<%= database.database_id %>"
+						aria-label="Update database <%= database.db_name %>">
 						Update
 					</button>
 				</td>
@@ -29,53 +33,67 @@
 	</table>
 </div>
 
-<!-- Modal for Creating New User -->
+<!-- Modal for Creating New Database -->
 <div id="createModal" class="modal">
 	<div class="modal-content">
 		<span class="close-button">&times;</span>
 		<form id="createForm" class="modal-form" autocomplete="off">
 			<div class="form-group">
-				<label for="name">Name:</label>
-				<input type="text" id="newName" name="name" required />
+				<label for="host">Host:</label>
+				<input type="text" id="newHost" name="host" required />
 			</div>
 			<div class="form-group">
-				<label for="email">Email:</label>
-				<input type="email" id="newEmail" name="email" required />
+				<label for="port">Port:</label>
+				<input type="text" id="newPort" name="port" required />
 			</div>
 			<div class="form-group">
-				<label for="password">Password:</label>
-				<input type="text" id="newPassword" name="password" required />
+				<label for="database">Database:</label>
+				<input type="text" id="newDatabase" name="database" required />
+			</div>
+			<div class="form-group">
+				<label for="username">Username:</label>
+				<input type="text" id="newUsername" name="username" required />
+			</div>
+			<div class="form-group">
+				<label for="username">Password:</label>
+				<input type="text" id="newPassword" name="username" required />
 			</div>
 			<div class="modal-actions">
-				<button type="button" id="createButton">Create User</button>
+				<button type="button" id="createButton">Create Database</button>
 			</div>
 		</form>
 	</div>
 </div>
 
-<!-- Modal for User Update -->
+<!-- Modal for Database Update -->
 <div id="updateModal" class="modal">
 	<div class="modal-content">
 		<span class="close-button">&times;</span>
 		<form id="updateForm" class="modal-form">
-			<!-- Hidden input for user_id -->
-			<input type="hidden" id="updateUserId" name="userId" />
+			<!-- Hidden input for database_id -->
+			<input type="hidden" id="updateDatabaseId" name="databaseId" />
 
 			<div class="form-group">
-				<label for="name">Name:</label>
-				<input type="text" id="updateName" name="name" required />
+				<label for="host">Host:</label>
+				<input type="text" id="updateHost" name="host" required />
 			</div>
 			<div class="form-group">
-				<label for="email">Email:</label>
-				<input type="email" id="updateEmail" name="email" required />
+				<label for="port">Port:</label>
+				<input type="text" id="updatePort" name="port" required />
 			</div>
 			<div class="form-group">
-				<label for="status">Status:</label>
-				<select id="updateStatus" name="status" required>
-					<option value="ACTIVE">ACTIVE</option>
-					<option value="INACTIVE">INACTIVE</option>
-				</select>
+				<label for="database">Database:</label>
+				<input type="text" id="updateDatabase" name="database" required />
 			</div>
+			<div class="form-group">
+				<label for="username">Username:</label>
+				<input type="text" id="updateUsername" name="username" required />
+			</div>
+			<div class="form-group">
+				<label for="password">Password:</label>
+				<input type="text" id="updatePassword" name="password" required />
+			</div>
+
 			<div class="modal-actions">
 				<button type="button" id="deleteButton">Delete</button>
 				<button type="button" id="saveButton">Save</button>

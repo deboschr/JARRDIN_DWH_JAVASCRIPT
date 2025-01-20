@@ -1,7 +1,14 @@
-document
-	.getElementById("profileForm")
-	.addEventListener("submit", function (event) {
-		event.preventDefault(); // Mencegah pengiriman form standar
+// Initialize the functions when the document is ready
+document.addEventListener("DOMContentLoaded", function () {
+	updateProfile();
+	signOut();
+});
+
+// Function to handle profile updates
+function updateProfile() {
+	const form = document.getElementById("profileForm");
+	form.addEventListener("submit", function (event) {
+		event.preventDefault(); // Prevent standard form submission
 
 		const userId = document.getElementById("userId").value;
 		const name = document.getElementById("name").value;
@@ -9,32 +16,29 @@ document
 		const newPassword = document.getElementById("newPassword").value;
 		const confirmPassword = document.getElementById("confirmPassword").value;
 
-		// Validasi di sisi klien (opsional)
+		// Client-side validation (optional)
 		if (newPassword !== confirmPassword) {
 			alert("Passwords do not match.");
 			return;
 		}
 
 		const data = {
-			name: name || undefined,
-			email: email || undefined,
-			password: newPassword || undefined,
+			userId: userId,
+			name: name,
+			email: email,
+			password: newPassword,
 		};
 
 		fetch(`/api/v1/user/${userId}`, {
 			method: "PATCH",
-			headers: {
-				"Content-Type": "application/json",
-			},
+			headers: { "Content-Type": "application/json" },
 			body: JSON.stringify(data),
 		})
-			.then((response) => {
-				return response.json();
-			})
+			.then((response) => response.json())
 			.then((data) => {
 				if (data.success) {
 					alert("Profile updated successfully!");
-					location.reload();
+					location.reload(); // Reload the page to reflect the changes
 				} else {
 					alert(data.error);
 				}
@@ -44,3 +48,25 @@ document
 				alert("Error updating profile.");
 			});
 	});
+}
+
+// Function to handle user sign-out
+function signOut() {
+	const button = document.getElementById("signOutButton");
+	button.addEventListener("click", function () {
+		fetch("/api/v1/user/signout", {
+			method: "POST",
+		})
+			.then((response) => {
+				if (response.ok) {
+					window.location.href = "/page/v1/signin"; // Redirect to sign-in page
+				} else {
+					throw new Error("Failed to sign out");
+				}
+			})
+			.catch((error) => {
+				console.error("Error:", error);
+				alert("Sign out failed");
+			});
+	});
+}

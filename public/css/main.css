@@ -21,7 +21,10 @@ html {
 	background-color: rgb(233, 233, 233);
 	flex-grow: 1; /* Mengambil ruang tersisa setelah navbar */
 	padding: 20px; /* Padding sekitar konten */
-	/* background-color: #f4f4f4; Warna latar belakang abu-abu muda */
+	display: flex;
+	flex-direction: column;
+	/* align-items: center; Aligns items horizontally at the center */
+	/* justify-content: center; Centers content vertically within the container */
 }
 
 /* Mengatur navbar */

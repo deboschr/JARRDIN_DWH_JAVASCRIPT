@@ -6,8 +6,13 @@
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
 
+#profile-container h1 {
+	font-size: 30px;
+	text-align: center; /* Centers the text horizontally within the h1 element */
+}
+
 .form-group {
-	margin: 20px 20px;
+	margin: 20px 20px 20px 0px;
 }
 
 label {
@@ -36,4 +41,17 @@ input[type="password"] {
 
 .profile-button:hover {
 	background-color: #0056b3;
+}
+
+#signOutButton {
+	background-color: #ff4c4c; /* Red color */
+	color: white; /* White text color */
+	width: 540px;
+	margin-top: 20px;
+	margin-left: auto; /* Centers the button horizontally */
+	margin-right: auto; /* Centers the button horizontally */
+}
+
+#signOutButton:hover {
+	background-color: #e04343; /* Slightly darker red on hover */
 }

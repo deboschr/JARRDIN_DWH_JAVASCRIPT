@@ -3,7 +3,7 @@ const router = express.Router();
 
 const pageRoute = require("./pageRoute");
 const userRoute = require("./userRoute");
-// const dbConfigRoute = require("./dbConfigRoute");
+const databaseRoute = require("./databaseRoute");
 // const jobRoute = require("./jobRoute");
 
 router.get("/", (req, res) => {
@@ -13,7 +13,7 @@ router.get("/", (req, res) => {
 router.use("/page/:version", pageRoute);
 
 router.use("/api/:version/user", userRoute);
-// router.use("/api/:version/dbconfig", dbConfigRoute);
+router.use("/api/:version/database", databaseRoute);
 // router.use("/api/:version/job", jobRoute);
 
 module.exports = router;

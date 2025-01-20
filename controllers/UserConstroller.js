@@ -1,7 +1,6 @@
 const { UserService } = require("../services/UserService");
 const { Validator } = require("../utils/validators");
 const { Authentication } = require("../middlewares/Authentication");
-const { Authorization } = require("../middlewares/Authorization");
 
 class UserController {
 	static async signin(req, res) {
@@ -47,29 +46,16 @@ class UserController {
 
 	static async signout(req, res) {
 		try {
-			let { error } = Validator.signinSignup(req.body);
+			// Destroying the session
+			req.session.destroy((err) => {
+				if (err) {
+					throw err;
+				}
+			});
 
-			if (error) {
-				const newError = new Error(error.details[0].message);
-				newError.status = 400;
-				throw newError;
-			}
-
-			const findUser = await UserService.readOne(req.body.username);
-
-			if (findUser) {
-				const newError = new Error(`Username sudah terdaftar.`);
-				newError.status = 400;
-				throw newError;
-			}
-
-			const hashedPassword = await Authentication.encryption(req.body.password);
-
-			req.body.password = hashedPassword;
-
-			const createUser = await UserService.create(req.body);
-
-			res.status(200).json({ success: true });
+			res
+				.status(200)
+				.json({ success: true, message: "Successfully signed out." });
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });

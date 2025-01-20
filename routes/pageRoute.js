@@ -20,16 +20,7 @@ router.get(
 	// Authorization.decryption,
 	PageController.job
 );
-router.get(
-	"/user",
-	// Authorization.decryption,
-	PageController.user
-);
-router.get(
-	"/profile",
-	//
-	Authorization.decryption,
-	PageController.profile
-);
+router.get("/user", Authorization.decryption, PageController.user);
+router.get("/profile", Authorization.decryption, PageController.profile);
 
 module.exports = router;
