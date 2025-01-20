@@ -117,7 +117,7 @@ class UserRepository {
 		try {
 			transaction = await MyDB.transaction();
 
-			const findUser = await UserModel.finOne({
+			const findUser = await UserModel.findOne({
 				where: { user_id: userId },
 			});
 

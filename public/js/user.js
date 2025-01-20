@@ -1,14 +1,8 @@
 document.addEventListener("DOMContentLoaded", function () {
-	// Membuka modal create
 	setupCreateModalToggles();
-
-	// Membuka modal update
 	setupUpdateModalToggles();
-
-	// Menutup modal
 	setupModalCloseButtons();
-
-	setupNewUserCreation();
+	bindModalFormActions();
 });
 
 function setupCreateModalToggles() {
@@ -22,9 +16,8 @@ function setupUpdateModalToggles() {
 	const updateButtons = document.querySelectorAll(".update-button");
 	updateButtons.forEach((button) => {
 		button.addEventListener("click", function () {
-			document.getElementById("updateModal").style.display = "block";
 			const userId = button.getAttribute("data-userid");
-			fetchUserDetails(userId);
+			getUserDetails(userId);
 		});
 	});
 }
@@ -38,10 +31,11 @@ function setupModalCloseButtons() {
 	});
 }
 
-function fetchUserDetails(userId) {
+function getUserDetails(userId) {
 	fetch(`/api/v1/user/${userId}`)
 		.then((response) => response.json())
 		.then((user) => {
+			document.getElementById("updateUserId").value = userId; // Set the user ID for use in update/delete functions
 			document.getElementById("updateName").value = user.name;
 			document.getElementById("updateEmail").value = user.email;
 			document.getElementById("updateStatus").value = user.status;
@@ -50,13 +44,10 @@ function fetchUserDetails(userId) {
 		.catch((error) => console.error("Error fetching user details:", error));
 }
 
-function setupNewUserCreation() {
-	document
-		.getElementById("createForm")
-		.addEventListener("submit", function (event) {
-			event.preventDefault();
-			createUser();
-		});
+function bindModalFormActions() {
+	document.getElementById("createButton").addEventListener("click", createUser);
+	document.getElementById("saveButton").addEventListener("click", updateUser);
+	document.getElementById("deleteButton").addEventListener("click", deleteUser);
 }
 
 function createUser() {
@@ -64,7 +55,7 @@ function createUser() {
 	const email = document.getElementById("newEmail").value;
 	const password = document.getElementById("newPassword").value;
 
-	fetch("/api/v1/user", {
+	fetch("/api/v1/user/signup", {
 		method: "POST",
 		headers: { "Content-Type": "application/json" },
 		body: JSON.stringify({ name, email, password }),
@@ -77,5 +68,45 @@ function createUser() {
 		.catch((error) => {
 			console.error("Error creating user:", error);
 			alert("Failed to create user.");
+		});
+}
+
+function updateUser() {
+	const userId = document.getElementById("updateUserId").value;
+	const name = document.getElementById("updateName").value;
+	const email = document.getElementById("updateEmail").value;
+	const status = document.getElementById("updateStatus").value;
+
+	fetch(`/api/v1/user/${userId}`, {
+		method: "PATCH",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ name, email, status }),
+	})
+		.then((response) => response.json())
+		.then((data) => {
+			alert("User updated successfully!");
+			location.reload(); // Reload to see changes
+		})
+		.catch((error) => {
+			console.error("Error updating user:", error);
+			alert("Failed to update user.");
+		});
+}
+
+function deleteUser() {
+	const userId = document.getElementById("updateUserId").value;
+
+	fetch(`/api/v1/user/${userId}`, {
+		method: "DELETE",
+		headers: { "Content-Type": "application/json" },
+	})
+		.then((response) => response.json())
+		.then((data) => {
+			alert("User deleted successfully!");
+			location.reload(); // Reload to see changes
+		})
+		.catch((error) => {
+			console.error("Error deleting user:", error);
+			alert("Failed to delete user.");
 		});
 }

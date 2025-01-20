@@ -89,7 +89,7 @@ class UserController {
 
 	static async getOne(req, res) {
 		try {
-			let readUser = await UserService.readAll();
+			let readUser = await UserService.findUser({ user_id: req.params.id });
 
 			res.status(200).json(readUser);
 		} catch (error) {
@@ -124,7 +124,7 @@ class UserController {
 
 	static async delete(req, res) {
 		try {
-			const deleteUser = await UserService.delete(req.params.id);
+			const deleteUser = await UserService.deleteUser(req.params.id);
 
 			res.status(200).json({ success: true });
 		} catch (error) {

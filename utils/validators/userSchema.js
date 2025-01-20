@@ -81,8 +81,8 @@ const userSchema = {
 					"string.max": "Password must be less than or equal to 200 characters",
 					"string.pattern.base": "Password must not contain spaces",
 				}),
-			status: Joi.string().valid("active", "nonactive").optional().messages({
-				"any.only": 'Status must be either "active" or "nonactive"',
+			status: Joi.string().valid("ACTIVE", "INACTIVE").optional().messages({
+				"any.only": 'Status must be either "ACTIVE" or "INACTIVE"',
 			}),
 		}).required();
 
