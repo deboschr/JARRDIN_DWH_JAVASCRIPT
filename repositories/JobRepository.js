@@ -64,7 +64,7 @@ class JobRepository {
 						destination_db: findJob?.destination_db.db_name,
 						destination_tables: findJob?.destination_tables,
 						duplicate_keys: findJob?.duplicate_keys,
-						trasform_script: findJob?.trasform_script,
+						transform_script: findJob?.transform_script,
 						status: findJob?.status,
 						created_by: findJob?.creator?.name,
 						created_at: findJob?.created_at,
@@ -83,7 +83,6 @@ class JobRepository {
 		try {
 			const findJob = await JobModel.findOne({
 				where: { job_id: job_id },
-				raw: true,
 				include: [
 					{
 						model: UserModel,
@@ -100,13 +99,13 @@ class JobRepository {
 					{
 						model: DatabaseModel,
 						required: true,
-						attributes: ["db_name"],
+						attributes: ["database_id", "db_name"],
 						as: "source_db",
 					},
 					{
 						model: DatabaseModel,
 						required: true,
-						attributes: ["db_name"],
+						attributes: ["database_id", "db_name"],
 						as: "destination_db",
 					},
 				],
@@ -117,12 +116,18 @@ class JobRepository {
 						job_id: findJob?.job_id,
 						name: findJob?.name,
 						cron: findJob?.cron,
-						source_db: findJob?.source_db.db_name,
-						source_tables: findJob?.source_tables,
-						destination_db: findJob?.destination_db.db_name,
-						destination_tables: findJob?.destination_tables,
-						duplicate_keys: findJob?.duplicate_keys,
-						trasform_script: findJob?.trasform_script,
+						source_db: findJob?.source_db,
+						source_tables: findJob?.source_tables
+							? JSON.parse(findJob?.source_tables)
+							: "",
+						destination_db: findJob?.destination_db,
+						destination_tables: findJob?.destination_tables
+							? JSON.parse(findJob?.destination_tables)
+							: "",
+						duplicate_keys: findJob?.duplicate_keys
+							? JSON.parse(findJob?.duplicate_keys)
+							: "",
+						transform_script: findJob?.transform_script,
 						status: findJob?.status,
 						created_by: findJob?.creator?.name,
 						created_at: findJob?.created_at,
@@ -151,7 +156,7 @@ class JobRepository {
 					destination_db_id: dataJob.destination_db_id,
 					destination_tables: dataJob.destination_tables,
 					duplicate_keys: dataJob.duplicate_keys,
-					trasform_script: dataJob.trasform_script,
+					transform_script: dataJob.transform_script,
 					created_by: dataSession.user_id,
 				},
 				{ transaction }
@@ -201,6 +206,7 @@ class JobRepository {
 					duplicate_keys: dataJob.duplicate_keys || findJob.duplicate_keys,
 					transform_script:
 						dataJob.transform_script || findJob.transform_script,
+					status: dataJob.status || findJob.status,
 					updated_by: dataSession.user_id,
 				},
 				{ transaction }

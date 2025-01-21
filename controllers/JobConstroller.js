@@ -16,7 +16,7 @@ class JobController {
 	static async getOne(req, res) {
 		try {
 			let readJob = await JobService.findJob({
-				database_id: req.params.id,
+				job_id: req.params.id,
 			});
 
 			res.status(200).json(readJob);
@@ -52,7 +52,7 @@ class JobController {
 		try {
 			const updateData = {
 				...req.body,
-				database_id: req.params.id,
+				job_id: req.params.id,
 			};
 
 			let { error } = Validator.updateJob(updateData);

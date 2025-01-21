@@ -43,8 +43,8 @@
 				<input type="text" id="newCron" name="cron" required />
 			</div>
 			<div class="form-group">
-				<label for="source_database">Source Database:</label>
-				<select id="newSourceDatabase" name="source_database" required>
+				<label for="source_db_id">Source Database:</label>
+				<select id="newSourceDatabase" name="source_db_id" required>
 					<option value="" disabled selected>Select your option</option>
 					<% dataDatabase.forEach(db => { %>
 					<option value="<%= db.database_id %>"><%= db.db_name %></option>
@@ -56,11 +56,8 @@
 				<input type="text" id="newSourceTables" name="source_tables" required />
 			</div>
 			<div class="form-group">
-				<label for="destination_database">Destination Database:</label>
-				<select
-					id="newDestinationDatabase"
-					name="destination_database"
-					required>
+				<label for="destination_db_id">Destination Database:</label>
+				<select id="newDestinationDatabase" name="destination_db_id" required>
 					<option value="" disabled selected>Select your option</option>
 					<% dataDatabase.forEach(db => { %>
 					<option value="<%= db.database_id %>"><%= db.db_name %></option>
@@ -109,37 +106,46 @@
 
 			<div class="form-group">
 				<label for="name">Name:</label>
-				<input type="text" id="newName" name="name" required />
+				<input type="text" id="updateName" name="name" required />
 			</div>
 			<div class="form-group">
 				<label for="cron">Cron:</label>
-				<input type="text" id="newCron" name="cron" required />
+				<input type="text" id="updateCron" name="cron" required />
 			</div>
 			<div class="form-group">
-				<label for="source_database">Source Database:</label>
-				<input
-					type="text"
-					id="newSourceDatabase"
-					name="source_database"
-					required />
+				<label for="source_db_id">Source Database:</label>
+				<select id="updateSourceDatabase" name="source_db_id" required>
+					<option value="" disabled selected>Select your option</option>
+					<% dataDatabase.forEach(db => { %>
+					<option value="<%= db.database_id %>"><%= db.db_name %></option>
+					<% }) %>
+				</select>
 			</div>
 			<div class="form-group">
 				<label for="source_tables">Source Tables:</label>
-				<input type="text" id="newSourceTables" name="source_tables" required />
-			</div>
-			<div class="form-group">
-				<label for="destination_database">Destination Database:</label>
 				<input
 					type="text"
-					id="newDestinationDatabase"
-					name="destination_database"
+					id="updateSourceTables"
+					name="source_tables"
 					required />
+			</div>
+			<div class="form-group">
+				<label for="destination_db_id">Destination Database:</label>
+				<select
+					id="updateDestinationDatabase"
+					name="destination_db_id"
+					required>
+					<option value="" disabled selected>Select your option</option>
+					<% dataDatabase.forEach(db => { %>
+					<option value="<%= db.database_id %>"><%= db.db_name %></option>
+					<% }) %>
+				</select>
 			</div>
 			<div class="form-group">
 				<label for="destination_tables">Destination Tables:</label>
 				<input
 					type="text"
-					id="newDestinationTables"
+					id="updateDestinationTables"
 					name="destination_tables"
 					required />
 			</div>
@@ -147,17 +153,17 @@
 				<label for="duplicate_keys">Duplicate Keys:</label>
 				<input
 					type="text"
-					id="newDuplicateKeys"
+					id="updateDuplicateKeys"
 					name="duplicate_keys"
 					required />
 			</div>
 			<div class="form-group">
 				<label for="transform_script">Transform Script:</label>
-				<input
-					type="text"
-					id="newTransformScript"
+				<textarea
+					id="updateTransformScript"
 					name="transform_script"
-					required />
+					required
+					rows="4"></textarea>
 			</div>
 			<div class="form-group">
 				<label for="status">Status:</label>
