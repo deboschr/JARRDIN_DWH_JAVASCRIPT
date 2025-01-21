@@ -3,8 +3,6 @@ const { spawn } = require("child_process");
 const { JobModel } = require("../models/JobModel");
 
 class ScheduleManager {
-	static JOBS = {};
-
 	static createTask(dataJob) {
 		try {
 			if (schedule.scheduledJobs[dataJob.name]) {
@@ -68,9 +66,6 @@ class ScheduleManager {
 					console.log(`ETL process exited with code: ${code}`);
 				});
 			});
-
-			// Simpan job ke dalam JOBS
-			this.JOBS[dataJob.name] = newJob;
 		} catch (error) {
 			throw error;
 		}

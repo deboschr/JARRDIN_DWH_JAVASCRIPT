@@ -1,5 +1,7 @@
 const { JobRepository } = require("../repositories/JobRepository.js");
 const { ScheduleManager } = require("../utils/ScheduleManager.js");
+const DatabaseConnection = require("../config/DatabaseConnection.js");
+const MyDB = DatabaseConnection.getConnection();
 
 class JobService {
 	static async findJob(identifier) {
@@ -35,7 +37,13 @@ class JobService {
 				throw newError;
 			}
 
-			const newJob = await JobRepository.create(dataJob, dataSession);
+			const transaction = await MyDB.transaction();
+
+			const newJob = await JobRepository.create(
+				dataJob,
+				dataSession,
+				transaction
+			);
 
 			return newJob;
 		} catch (error) {

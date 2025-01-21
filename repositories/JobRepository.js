@@ -142,10 +142,12 @@ class JobRepository {
 		}
 	}
 
-	static async create(dataJob, dataSession) {
+	static async create(dataJob, dataSession, globalTransaction) {
 		let transaction;
 		try {
-			transaction = await MyDB.transaction();
+			transaction = globalTransaction
+				? globalTransaction
+				: await MyDB.transaction();
 
 			const createJob = await JobModel.create(
 				{
@@ -162,7 +164,9 @@ class JobRepository {
 				{ transaction }
 			);
 
-			await transaction.commit();
+			if (!globalTransaction) {
+				await transaction.commit();
+			}
 
 			return createJob;
 		} catch (error) {
