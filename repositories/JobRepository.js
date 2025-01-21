@@ -170,7 +170,9 @@ class JobRepository {
 
 			return createJob;
 		} catch (error) {
-			if (transaction) await transaction.rollback();
+			if (transaction && !transaction.finished) {
+				await transaction.rollback();
+			}
 
 			if (error instanceof Sequelize.UniqueConstraintError) {
 				const newError = new Error(error.errors[0].message);
