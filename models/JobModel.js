@@ -55,7 +55,7 @@ const JobModel = MyDB.define(
 			allowNull: true,
 		},
 		status: {
-			type: DataTypes.ENUM("ACTIVE", "NONACTIVE"),
+			type: DataTypes.ENUM("ACTIVE", "INACTIVE"),
 			defaultValue: "ACTIVE",
 			allowNull: false,
 		},

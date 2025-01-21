@@ -1,1 +1,175 @@
-<h1>Job Management</h1>
+<div class="job-container">
+	<button id="newJobButton" class="new-job-button">New Job</button>
+	<table class="job-table">
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Cron</th>
+				<th>Status</th>
+				<th>Action</th>
+			</tr>
+		</thead>
+		<tbody>
+			<% dataJob.forEach(job => { %>
+			<tr>
+				<td><%= job.name %></td>
+				<td><%= job.cron %></td>
+				<td><%= job.status %></td>
+				<td>
+					<button
+						class="update-button"
+						data-jobid="<%= job.job_id %>"
+						aria-label="Update job <%= job.name %>">
+						Update
+					</button>
+				</td>
+			</tr>
+			<% }) %>
+		</tbody>
+	</table>
+</div>
+
+<!-- Modal for Creating New Job -->
+<div id="createModal" class="modal">
+	<div class="modal-content">
+		<span class="close-button">&times;</span>
+		<form id="createForm" class="modal-form" autocomplete="off">
+			<div class="form-group">
+				<label for="name">Name:</label>
+				<input type="text" id="newName" name="name" required />
+			</div>
+			<div class="form-group">
+				<label for="cron">Cron:</label>
+				<input type="text" id="newCron" name="cron" required />
+			</div>
+			<div class="form-group">
+				<label for="source_database">Source Database:</label>
+				<select id="newSourceDatabase" name="source_database" required>
+					<option value="" disabled selected>Select your option</option>
+					<% dataDatabase.forEach(db => { %>
+					<option value="<%= db.database_id %>"><%= db.db_name %></option>
+					<% }) %>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="source_tables">Source Tables:</label>
+				<input type="text" id="newSourceTables" name="source_tables" required />
+			</div>
+			<div class="form-group">
+				<label for="destination_database">Destination Database:</label>
+				<select
+					id="newDestinationDatabase"
+					name="destination_database"
+					required>
+					<option value="" disabled selected>Select your option</option>
+					<% dataDatabase.forEach(db => { %>
+					<option value="<%= db.database_id %>"><%= db.db_name %></option>
+					<% }) %>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="destination_tables">Destination Tables:</label>
+				<input
+					type="text"
+					id="newDestinationTables"
+					name="destination_tables"
+					required />
+			</div>
+			<div class="form-group">
+				<label for="duplicate_keys">Duplicate Keys:</label>
+				<input
+					type="text"
+					id="newDuplicateKeys"
+					name="duplicate_keys"
+					required />
+			</div>
+			<div class="form-group">
+				<label for="transform_script">Transform Script:</label>
+				<textarea
+					id="newTransformScript"
+					name="transform_script"
+					required
+					rows="4"></textarea>
+			</div>
+
+			<div class="modal-actions">
+				<button type="button" id="createButton">Create Job</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Modal for Job Update -->
+<div id="updateModal" class="modal">
+	<div class="modal-content">
+		<span class="close-button">&times;</span>
+		<form id="updateForm" class="modal-form">
+			<!-- Hidden input for job_id -->
+			<input type="hidden" id="updateJobId" name="jobId" />
+
+			<div class="form-group">
+				<label for="name">Name:</label>
+				<input type="text" id="newName" name="name" required />
+			</div>
+			<div class="form-group">
+				<label for="cron">Cron:</label>
+				<input type="text" id="newCron" name="cron" required />
+			</div>
+			<div class="form-group">
+				<label for="source_database">Source Database:</label>
+				<input
+					type="text"
+					id="newSourceDatabase"
+					name="source_database"
+					required />
+			</div>
+			<div class="form-group">
+				<label for="source_tables">Source Tables:</label>
+				<input type="text" id="newSourceTables" name="source_tables" required />
+			</div>
+			<div class="form-group">
+				<label for="destination_database">Destination Database:</label>
+				<input
+					type="text"
+					id="newDestinationDatabase"
+					name="destination_database"
+					required />
+			</div>
+			<div class="form-group">
+				<label for="destination_tables">Destination Tables:</label>
+				<input
+					type="text"
+					id="newDestinationTables"
+					name="destination_tables"
+					required />
+			</div>
+			<div class="form-group">
+				<label for="duplicate_keys">Duplicate Keys:</label>
+				<input
+					type="text"
+					id="newDuplicateKeys"
+					name="duplicate_keys"
+					required />
+			</div>
+			<div class="form-group">
+				<label for="transform_script">Transform Script:</label>
+				<input
+					type="text"
+					id="newTransformScript"
+					name="transform_script"
+					required />
+			</div>
+			<div class="form-group">
+				<label for="status">Status:</label>
+				<select id="updateStatus" name="status" required>
+					<option value="ACTIVE">ACTIVE</option>
+					<option value="INACTIVE">INACTIVE</option>
+				</select>
+			</div>
+			<div class="modal-actions">
+				<button type="button" id="deleteButton">Delete</button>
+				<button type="button" id="saveButton">Save</button>
+			</div>
+		</form>
+	</div>
+</div>

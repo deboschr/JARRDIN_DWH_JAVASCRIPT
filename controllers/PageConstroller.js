@@ -1,5 +1,6 @@
 const { UserService } = require("../services/UserService");
 const { DatabaseService } = require("../services/DatabaseService");
+const { JobService } = require("../services/JobService");
 
 class PageController {
 	static async signin(req, res) {
@@ -25,9 +26,14 @@ class PageController {
 
 	static async job(req, res) {
 		try {
+			const dataJob = await JobService.findJob();
+			const dataDatabase = await DatabaseService.findDatabase();
+
 			res.status(200).render("job", {
 				page: "job",
 				layout: "layouts/main",
+				dataJob: dataJob,
+				dataDatabase: dataDatabase,
 			});
 		} catch (error) {
 			console.error(error);

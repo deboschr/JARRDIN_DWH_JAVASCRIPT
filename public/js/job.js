@@ -1,98 +1,112 @@
 document.addEventListener("DOMContentLoaded", function () {
-	fetchJobs(); // Memanggil fungsi fetchJobs saat halaman dimuat
+	setupCreateModalToggles();
+	setupUpdateModalToggles();
+	setupModalCloseButtons();
+	bindModalFormActions();
 });
 
-// Fungsi untuk mengambil semua job dari server dan menampilkannya di tabel
-function fetchJobs() {
-	fetch("http://localhost:3000/job")
-		.then((response) => response.json())
-		.then((data) => {
-			const jobTableBody = document
-				.getElementById("jobTable")
-				.getElementsByTagName("tbody")[0];
-			jobTableBody.innerHTML = ""; // Bersihkan tabel sebelum diisi
-
-			data.forEach((job) => {
-				let row = jobTableBody.insertRow();
-				row.innerHTML = `
-                    <td>${job.job_id}</td>
-                    <td>${job.name}</td>
-                    <td>${job.status}</td>
-                    <td>
-                        <button class="button-edit" onclick="showEditJobModal(${job.job_id})">Edit</button>
-                        <button class="button-delete" onclick="deleteJob(${job.job_id})">Delete</button>
-                    </td>
-                `;
-			});
-		})
-		.catch((error) => console.error("Error fetching jobs:", error));
+function setupCreateModalToggles() {
+	const createButton = document.getElementById("newJobButton");
+	createButton.addEventListener("click", function () {
+		document.getElementById("createModal").style.display = "block";
+	});
 }
 
-// Fungsi untuk menampilkan modal dan menambahkan job baru
-function addJob() {
-	const jobName = document.getElementById("jobName").value;
-	const jobData = {
-		name: jobName,
-		status: "Active", // Status default saat penambahan
-	};
-
-	fetch("http://localhost:3000/job", {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(jobData),
-	})
-		.then((response) => response.json())
-		.then((data) => {
-			console.log("Job added:", data);
-			fetchJobs(); // Refresh job list
-		})
-		.catch((error) => console.error("Error adding job:", error));
+function setupUpdateModalToggles() {
+	const updateButtons = document.querySelectorAll(".update-button");
+	updateButtons.forEach((button) => {
+		button.addEventListener("click", function () {
+			const jobId = button.getAttribute("data-jobid");
+			getJobDetails(jobId);
+		});
+	});
 }
 
-// Fungsi untuk menampilkan modal dengan detail job dan memperbarui
-function showEditJobModal(jobId) {
-	// Ambil data job berdasarkan jobId untuk diisi dalam form modal (implementasi modal tidak ditunjukkan)
-	fetch(`http://localhost:3000/job/${jobId}`)
+function setupModalCloseButtons() {
+	const closeButtons = document.querySelectorAll(".close-button");
+	closeButtons.forEach((button) => {
+		button.addEventListener("click", function () {
+			this.closest(".modal").style.display = "none";
+		});
+	});
+}
+
+function getJobDetails(jobId) {
+	fetch(`/api/v1/job/${jobId}`)
 		.then((response) => response.json())
-		.then((data) => {
-			console.log("Editing job:", data); // Log data atau isi form edit
+		.then((job) => {
+			document.getElementById("updateJobId").value = jobId; // Set the job ID for use in update/delete functions
+			document.getElementById("updateName").value = job.name;
+			document.getElementById("updateCron").value = job.cron;
+			document.getElementById("updateStatus").value = job.status;
+			document.getElementById("updateModal").style.display = "block";
 		})
 		.catch((error) => console.error("Error fetching job details:", error));
 }
 
-// Fungsi untuk mengupdate job yang ada
-function updateJob(jobId) {
-	const jobData = {
-		name: document.getElementById("editJobName").value,
-		status: document.getElementById("editJobStatus").value,
-	};
-
-	fetch(`http://localhost:3000/job/${jobId}`, {
-		method: "PATCH",
-		headers: {
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify(jobData),
-	})
-		.then((response) => response.json())
-		.then((data) => {
-			console.log("Job updated:", data);
-			fetchJobs(); // Refresh job list
-		})
-		.catch((error) => console.error("Error updating job:", error));
+function bindModalFormActions() {
+	document.getElementById("createButton").addEventListener("click", createJob);
+	document.getElementById("saveButton").addEventListener("click", updateJob);
+	document.getElementById("deleteButton").addEventListener("click", deleteJob);
 }
 
-// Fungsi untuk menghapus job
-function deleteJob(jobId) {
-	fetch(`http://localhost:3000/job/${jobId}`, {
-		method: "DELETE",
+function createJob() {
+	const name = document.getElementById("newName").value;
+	const cron = document.getElementById("newCron").value;
+	const password = document.getElementById("newPassword").value;
+
+	fetch("/api/v1/job/signup", {
+		method: "POST",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ name, cron, password }),
 	})
 		.then((response) => response.json())
 		.then((data) => {
-			console.log("Job deleted:", data);
-			fetchJobs(); // Refresh job list
+			alert("Job created successfully!");
+			location.reload(); // Reload to update the list of jobs
 		})
-		.catch((error) => console.error("Error deleting job:", error));
+		.catch((error) => {
+			console.error("Error creating job:", error);
+			alert("Failed to create job.");
+		});
+}
+
+function updateJob() {
+	const jobId = document.getElementById("updateJobId").value;
+	const name = document.getElementById("updateName").value;
+	const cron = document.getElementById("updateCron").value;
+	const status = document.getElementById("updateStatus").value;
+
+	fetch(`/api/v1/job/${jobId}`, {
+		method: "PATCH",
+		headers: { "Content-Type": "application/json" },
+		body: JSON.stringify({ name, cron, status }),
+	})
+		.then((response) => response.json())
+		.then((data) => {
+			alert("Job updated successfully!");
+			location.reload(); // Reload to see changes
+		})
+		.catch((error) => {
+			console.error("Error updating job:", error);
+			alert("Failed to update job.");
+		});
+}
+
+function deleteJob() {
+	const jobId = document.getElementById("updateJobId").value;
+
+	fetch(`/api/v1/job/${jobId}`, {
+		method: "DELETE",
+		headers: { "Content-Type": "application/json" },
+	})
+		.then((response) => response.json())
+		.then((data) => {
+			alert("Job deleted successfully!");
+			location.reload(); // Reload to see changes
+		})
+		.catch((error) => {
+			console.error("Error deleting job:", error);
+			alert("Failed to delete job.");
+		});
 }
