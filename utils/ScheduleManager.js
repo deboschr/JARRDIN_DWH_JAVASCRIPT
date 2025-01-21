@@ -27,45 +27,49 @@ class ScheduleManager {
 			});
 
 			// Menjadwalkan job
-			const newJob = schedule.scheduleJob(dataJob.name, rule, async () => {
-				console.log(
-					`>> Job ${dataJob.name} dijalankan pada:`,
-					new Date().toLocaleString()
-				);
+			const newJob = schedule.scheduleJob(
+				dataJob.name,
+				dataJob.cron,
+				async () => {
+					console.log(
+						`>> Job ${dataJob.name} dijalankan pada:`,
+						new Date().toLocaleString()
+					);
 
-				const findJob = await JobModel.findOne({
-					where: { name: dataJob.name },
-				});
+					const findJob = await JobModel.findOne({
+						where: { name: dataJob.name },
+					});
 
-				if (!findJob) {
-					throw new Error(`Job dengan nama ${dataJob.name} tidak ditemukan.`);
-				}
-
-				// Jalankan proses ETL dengan last_execute terbaru
-				const pythonProcess = spawn("python3", [
-					"python/main.py",
-					findJob.name,
-				]);
-
-				pythonProcess.stdout.on("data", (data) => {
-					console.log(`>> STDOUT: ${data}`);
-				});
-
-				pythonProcess.stderr.on("data", (data) => {
-					console.error(`>> STDERR: ${data}`);
-				});
-
-				pythonProcess.on("error", (error) => {
-					console.error(`>> ERROR: ${error.message}`);
-				});
-
-				pythonProcess.on("close", async (code) => {
-					if (code === 0) {
-						// await findJob.update({ count: findJob.count + 1 });
+					if (!findJob) {
+						throw new Error(`Job dengan nama ${dataJob.name} tidak ditemukan.`);
 					}
-					console.log(`ETL process exited with code: ${code}`);
-				});
-			});
+
+					// Jalankan proses ETL dengan last_execute terbaru
+					const pythonProcess = spawn("python3", [
+						"python/main.py",
+						findJob.name,
+					]);
+
+					pythonProcess.stdout.on("data", (data) => {
+						console.log(`>> STDOUT: ${data}`);
+					});
+
+					pythonProcess.stderr.on("data", (data) => {
+						console.error(`>> STDERR: ${data}`);
+					});
+
+					pythonProcess.on("error", (error) => {
+						console.error(`>> ERROR: ${error.message}`);
+					});
+
+					pythonProcess.on("close", async (code) => {
+						if (code === 0) {
+							// await findJob.update({ count: findJob.count + 1 });
+						}
+						console.log(`ETL process exited with code: ${code}`);
+					});
+				}
+			);
 		} catch (error) {
 			throw error;
 		}

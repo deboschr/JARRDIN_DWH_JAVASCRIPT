@@ -45,6 +45,8 @@ class JobService {
 				transaction
 			);
 
+			ScheduleManager.createTask(newJob);
+
 			return newJob;
 		} catch (error) {
 			throw error;
