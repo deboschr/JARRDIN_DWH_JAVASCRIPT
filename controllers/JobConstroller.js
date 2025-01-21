@@ -2,15 +2,11 @@ const { JobService } = require("../services/JobService");
 const { Validator } = require("../utils/validators");
 
 class JobController {
-	static async jobPage(req, res) {
+	static async getAll(req, res) {
 		try {
-			let readJob = await JobService.read();
+			let readJob = await JobService.findJob();
 
-			res.status(200).render("job", {
-				page: "job",
-				layout: "layouts/main",
-				data: JSON.stringify(readJob),
-			});
+			res.status(200).json(readJob);
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });
@@ -19,7 +15,9 @@ class JobController {
 
 	static async getOne(req, res) {
 		try {
-			let readJob = await JobService.read();
+			let readJob = await JobService.findJob({
+				database_id: req.params.id,
+			});
 
 			res.status(200).json(readJob);
 		} catch (error) {
@@ -38,9 +36,12 @@ class JobController {
 				throw newError;
 			}
 
-			const createJob = await JobService.create(req.body, req.dataSession);
+			const newJob = await JobService.createJob(
+				req.body,
+				req.dataSession
+			);
 
-			res.status(200).json({ success: true });
+			res.status(200).json({ success: true, data: newJob });
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });
@@ -49,9 +50,25 @@ class JobController {
 
 	static async update(req, res) {
 		try {
-			const activateJob = await JobService.activate(req.params.id);
+			const updateData = {
+				...req.body,
+				database_id: req.params.id,
+			};
 
-			res.status(200).json({ success: true });
+			let { error } = Validator.updateJob(updateData);
+
+			if (error) {
+				const newError = new Error(error.details[0].message);
+				newError.status = 400;
+				throw newError;
+			}
+
+			const updatedJob = await JobService.updateJob(
+				updateData,
+				req.dataSession
+			);
+
+			res.status(200).json({ success: true, data: updatedJob });
 		} catch (error) {
 			console.error(error);
 			res.status(error.status || 500).json({ error: error.message });
@@ -60,7 +77,9 @@ class JobController {
 
 	static async delete(req, res) {
 		try {
-			const deleteJob = await JobService.delete(req.params.id);
+			const deleteJob = await JobService.deleteJob(
+				req.params.id
+			);
 
 			res.status(200).json({ success: true });
 		} catch (error) {

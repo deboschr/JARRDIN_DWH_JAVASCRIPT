@@ -174,13 +174,13 @@ class DatabaseRepository {
 		}
 	}
 
-	static async delete(databaseId) {
+	static async delete(database_id) {
 		let transaction;
 		try {
 			transaction = await MyDB.transaction();
 
 			const findDatabase = await DatabaseModel.findOne({
-				where: { database_id: databaseId },
+				where: { database_id: database_id },
 			});
 
 			if (!findDatabase) {

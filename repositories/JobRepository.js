@@ -3,53 +3,141 @@ const MyDB = DatabaseConnection.getConnection();
 const { Sequelize } = require("sequelize");
 
 const { JobModel } = require("../models/JobModel.js");
-const { ScheduleManager } = require("../utils/ScheduleManager.js");
+const { UserModel } = require("../models/UserModel.js");
+const { DatabaseModel } = require("../models/DatabaseModel.js");
 
 class JobRepository {
-	static async read(isReload = false) {
+	static async readAll() {
 		try {
 			const findJob = await JobModel.findAll({
 				order: [["name", "ASC"]],
+				attributes: ["job_id", "name", "cron", "status"],
 				raw: true,
 			});
 
-			// Menjadwal ulang semua job jika reload = true
-			if (isReload && findJob.length > 0) {
-				findJob.forEach((job) => {
-					ScheduleManager.createTask(job);
-				});
-				console.log(">> Job berhasil di reload.");
-			} else if (!isReload) {
-				const formattedResult = findJob.map((item) => ({
-					job_id: item.job_id,
-					name: item.name,
-					time: item.time,
-					step: item.step,
-					period: item.period,
-					count: item.count,
-					last_execute: item.updated_at,
-					source_db: item.source_db,
-					source_tables: item.source_tables
-						? JSON.parse(item.source_tables)
-						: null,
-					destination_db: item.destination_db,
-					destination_tables: item.destination_tables
-						? JSON.parse(item.destination_tables)
-						: null,
-					duplicate_keys: item.duplicate_keys
-						? JSON.parse(item.duplicate_keys)
-						: null,
-					status: item.status,
-				}));
-
-				return formattedResult;
-			}
+			return findJob;
 		} catch (error) {
 			throw error;
 		}
 	}
 
-	static async create(dataJob) {
+	static async readOneByName(name) {
+		try {
+			const findJob = await JobModel.findOne({
+				where: { name: name },
+				raw: true,
+				include: [
+					{
+						model: UserModel,
+						required: true,
+						attributes: ["name"],
+						as: "creator",
+					},
+					{
+						model: UserModel,
+						required: false,
+						attributes: ["name"],
+						as: "updator",
+					},
+					{
+						model: DatabaseModel,
+						required: true,
+						attributes: ["db_name"],
+						as: "source_db",
+					},
+					{
+						model: DatabaseModel,
+						required: true,
+						attributes: ["db_name"],
+						as: "destination_db",
+					},
+				],
+			});
+
+			const formattedResult = findJob
+				? {
+						job_id: findJob?.job_id,
+						name: findJob?.name,
+						cron: findJob?.cron,
+						source_db: findJob?.source_db.db_name,
+						source_tables: findJob?.source_tables,
+						destination_db: findJob?.destination_db.db_name,
+						destination_tables: findJob?.destination_tables,
+						duplicate_keys: findJob?.duplicate_keys,
+						trasform_script: findJob?.trasform_script,
+						status: findJob?.status,
+						created_by: findJob?.creator?.name,
+						created_at: findJob?.created_at,
+						updated_by: findJob?.updator?.name,
+						updated_at: findJob?.updated_at,
+				  }
+				: undefined;
+
+			return formattedResult;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	static async readOneById(job_id) {
+		try {
+			const findJob = await JobModel.findOne({
+				where: { job_id: job_id },
+				raw: true,
+				include: [
+					{
+						model: UserModel,
+						required: true,
+						attributes: ["name"],
+						as: "creator",
+					},
+					{
+						model: UserModel,
+						required: false,
+						attributes: ["name"],
+						as: "updator",
+					},
+					{
+						model: DatabaseModel,
+						required: true,
+						attributes: ["db_name"],
+						as: "source_db",
+					},
+					{
+						model: DatabaseModel,
+						required: true,
+						attributes: ["db_name"],
+						as: "destination_db",
+					},
+				],
+			});
+
+			const formattedResult = findJob
+				? {
+						job_id: findJob?.job_id,
+						name: findJob?.name,
+						cron: findJob?.cron,
+						source_db: findJob?.source_db.db_name,
+						source_tables: findJob?.source_tables,
+						destination_db: findJob?.destination_db.db_name,
+						destination_tables: findJob?.destination_tables,
+						duplicate_keys: findJob?.duplicate_keys,
+						trasform_script: findJob?.trasform_script,
+						status: findJob?.status,
+						created_by: findJob?.creator?.name,
+						created_at: findJob?.created_at,
+						updated_by: findJob?.updator?.name,
+						updated_at: findJob?.updated_at,
+				  }
+				: undefined;
+
+			return formattedResult;
+		} catch (error) {
+			throw error;
+		}
+	}
+
+	static async create(dataJob, dataSession) {
 		let transaction;
 		try {
 			transaction = await MyDB.transaction();
@@ -57,21 +145,17 @@ class JobRepository {
 			const createJob = await JobModel.create(
 				{
 					name: dataJob.name,
-					time: dataJob.time,
-					step: dataJob.step,
-					period: dataJob.period,
-					source_db: dataJob.source_db,
+					cron: dataJob.cron,
+					source_db_id: dataJob.source_db_id,
 					source_tables: dataJob.source_tables,
-					destination_db: dataJob.destination_db,
+					destination_db_id: dataJob.destination_db_id,
 					destination_tables: dataJob.destination_tables,
 					duplicate_keys: dataJob.duplicate_keys,
-					updated_at: dataJob.last_execute,
+					trasform_script: dataJob.trasform_script,
+					created_by: dataSession.user_id,
 				},
 				{ transaction }
 			);
-
-			// Menjadwalkan job
-			ScheduleManager.createTask(createJob);
 
 			await transaction.commit();
 
@@ -81,7 +165,7 @@ class JobRepository {
 
 			if (error instanceof Sequelize.UniqueConstraintError) {
 				const newError = new Error(error.errors[0].message);
-				newError.code = 400;
+				newError.status = 400;
 				throw newError;
 			}
 
@@ -89,24 +173,38 @@ class JobRepository {
 		}
 	}
 
-	static async activate(jobId) {
+	static async update(dataJob, dataSession) {
 		let transaction;
 		try {
 			transaction = await MyDB.transaction();
 
 			const findJob = await JobModel.findOne({
-				where: { job_id: jobId },
+				where: { job_id: dataJob.job_id },
 			});
 
 			if (!findJob) {
-				throw new Error(`Job tidak ditemukan.`);
+				const newError = new Error(`Job not found.`);
+				newError.status = 404;
+				throw newError;
 			}
 
-			// Menambahkan job ke penjadwalan
-			ScheduleManager.createTask(findJob.name);
-
-			// Menghapus job dari database
-			await findJob.update({ status: "ACTIVE" }, { transaction });
+			await findJob.update(
+				{
+					name: dataJob.name || findJob.name,
+					cron: dataJob.cron || findJob.cron,
+					source_db_id: dataJob.source_db_id || findJob.source_db_id,
+					source_tables: dataJob.source_tables || findJob.source_tables,
+					destination_db_id:
+						dataJob.destination_db_id || findJob.destination_db_id,
+					destination_tables:
+						dataJob.destination_tables || findJob.destination_tables,
+					duplicate_keys: dataJob.duplicate_keys || findJob.duplicate_keys,
+					transform_script:
+						dataJob.transform_script || findJob.transform_script,
+					updated_by: dataSession.user_id,
+				},
+				{ transaction }
+			);
 
 			await transaction.commit();
 
@@ -118,52 +216,21 @@ class JobRepository {
 		}
 	}
 
-	static async nonactivate(jobId) {
+	static async delete(job_id) {
 		let transaction;
 		try {
 			transaction = await MyDB.transaction();
 
 			const findJob = await JobModel.findOne({
-				where: { job_id: jobId },
+				where: { job_id: job_id },
 			});
 
 			if (!findJob) {
-				throw new Error(`Job tidak ditemukan.`);
+				const newError = new Error(`Job not found.`);
+				newError.status = 404;
+				throw newError;
 			}
 
-			// Menghentikan job dari penjadwalan
-			ScheduleManager.cancelTask(findJob.name);
-
-			// Menghapus job dari database
-			await findJob.update({ status: "NONACTIVE" }, { transaction });
-
-			await transaction.commit();
-
-			return findJob;
-		} catch (error) {
-			if (transaction) await transaction.rollback();
-
-			throw error;
-		}
-	}
-
-	static async delete(jobId) {
-		let transaction;
-		try {
-			transaction = await MyDB.transaction();
-
-			const findJob = await JobModel.findOne({
-				where: { job_id: jobId },
-			});
-
-			if (!findJob) {
-				throw new Error(`Job tidak ditemukan.`);
-			}
-
-			// Menghentikan job dari penjadwalan
-			ScheduleManager.cancelTask(findJob.name);
-
-			// Menghapus job dari database
 			await findJob.destroy({ transaction });
 
 			await transaction.commit();
