@@ -13,14 +13,6 @@ const JobModel = MyDB.define(
 			primaryKey: true,
 			autoIncrement: true,
 		},
-		created_by: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-		},
-		updated_by: {
-			type: DataTypes.INTEGER,
-			allowNull: true,
-		},
 		source_db_id: {
 			type: DataTypes.INTEGER,
 			allowNull: false,
@@ -58,6 +50,14 @@ const JobModel = MyDB.define(
 			type: DataTypes.ENUM("ACTIVE", "INACTIVE"),
 			defaultValue: "ACTIVE",
 			allowNull: false,
+		},
+		created_by: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+		},
+		updated_by: {
+			type: DataTypes.INTEGER,
+			allowNull: true,
 		},
 		created_at: {
 			type: DataTypes.DATE,

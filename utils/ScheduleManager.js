@@ -1,6 +1,6 @@
 const schedule = require("node-schedule");
-const { spawn } = require("child_process");
 const { JobModel } = require("../models/JobModel");
+const { DatabaseModel } = require("../models/DatabaseModel");
 
 class ScheduleManager {
 	static createTask(dataJob) {
@@ -15,6 +15,35 @@ class ScheduleManager {
 
 			const job = schedule.scheduleJob(dataJob.name, dataJob.cron, async () => {
 				try {
+					const findJob = await JobModel.findOne({
+						where: { name: dataJob.name },
+						attributes: [
+							"name",
+							"source_tables",
+							"destination_tables",
+							"duplicate_keys",
+							"transform_script",
+						],
+						include: [
+							{
+								model: DatabaseModel,
+								required: true,
+								attributes: ["host", "db_name", "username", "password"],
+								as: "source_db",
+							},
+							{
+								model: DatabaseModel,
+								required: true,
+								attributes: ["host", "db_name", "username", "password"],
+								as: "destination_db",
+							},
+						],
+					});
+
+					if (!findJob) {
+						throw new Error(`Job dengan nama ${dataJob.name} tidak ditemukan.`);
+					}
+
 					await etl(dataJob);
 
 					const currDate = new Date().toLocaleString();
@@ -25,51 +54,6 @@ class ScheduleManager {
 					);
 				}
 			});
-
-			// Menjadwalkan job
-			const newJob = schedule.scheduleJob(
-				dataJob.name,
-				dataJob.cron,
-				async () => {
-					console.log(
-						`>> Job ${dataJob.name} dijalankan pada:`,
-						new Date().toLocaleString()
-					);
-
-					const findJob = await JobModel.findOne({
-						where: { name: dataJob.name },
-					});
-
-					if (!findJob) {
-						throw new Error(`Job dengan nama ${dataJob.name} tidak ditemukan.`);
-					}
-
-					// Jalankan proses ETL dengan last_execute terbaru
-					const pythonProcess = spawn("python3", [
-						"python/main.py",
-						findJob.name,
-					]);
-
-					pythonProcess.stdout.on("data", (data) => {
-						console.log(`>> STDOUT: ${data}`);
-					});
-
-					pythonProcess.stderr.on("data", (data) => {
-						console.error(`>> STDERR: ${data}`);
-					});
-
-					pythonProcess.on("error", (error) => {
-						console.error(`>> ERROR: ${error.message}`);
-					});
-
-					pythonProcess.on("close", async (code) => {
-						if (code === 0) {
-							// await findJob.update({ count: findJob.count + 1 });
-						}
-						console.log(`ETL process exited with code: ${code}`);
-					});
-				}
-			);
 		} catch (error) {
 			throw error;
 		}

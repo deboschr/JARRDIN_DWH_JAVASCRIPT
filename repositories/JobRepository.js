@@ -25,30 +25,17 @@ class JobRepository {
 		try {
 			const findJob = await JobModel.findOne({
 				where: { name: name },
-				raw: true,
 				include: [
-					{
-						model: UserModel,
-						required: true,
-						attributes: ["name"],
-						as: "creator",
-					},
-					{
-						model: UserModel,
-						required: false,
-						attributes: ["name"],
-						as: "updator",
-					},
 					{
 						model: DatabaseModel,
 						required: true,
-						attributes: ["db_name"],
+						attributes: ["host", "db_name", "username", "password"],
 						as: "source_db",
 					},
 					{
 						model: DatabaseModel,
 						required: true,
-						attributes: ["db_name"],
+						attributes: ["host", "db_name", "username", "password"],
 						as: "destination_db",
 					},
 				],
@@ -59,16 +46,14 @@ class JobRepository {
 						job_id: findJob?.job_id,
 						name: findJob?.name,
 						cron: findJob?.cron,
-						source_db: findJob?.source_db.db_name,
+						source_db: findJob?.source_db,
 						source_tables: findJob?.source_tables,
-						destination_db: findJob?.destination_db.db_name,
+						destination_db: findJob?.destination_db,
 						destination_tables: findJob?.destination_tables,
 						duplicate_keys: findJob?.duplicate_keys,
 						transform_script: findJob?.transform_script,
 						status: findJob?.status,
-						created_by: findJob?.creator?.name,
 						created_at: findJob?.created_at,
-						updated_by: findJob?.updator?.name,
 						updated_at: findJob?.updated_at,
 				  }
 				: undefined;
