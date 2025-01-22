@@ -28,17 +28,25 @@ const UserModel = MyDB.define(
 			allowNull: false,
 		},
 		created_at: {
-			type: DataTypes.DATE,
+			type: DataTypes.BIGINT,
 			allowNull: true,
 		},
 		updated_at: {
-			type: DataTypes.DATE,
+			type: DataTypes.BIGINT,
 			allowNull: true,
 		},
 	},
 	{
 		tableName: "user",
 		timestamps: false,
+		hooks: {
+			beforeCreate: (data) => {
+				data.created_at = new Date().getTime();
+			},
+			beforeUpdate: (data) => {
+				data.updated_at = new Date().getTime();
+			},
+		},
 	}
 );
 

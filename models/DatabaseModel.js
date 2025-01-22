@@ -12,14 +12,6 @@ const DatabaseModel = MyDB.define(
 			primaryKey: true,
 			autoIncrement: true,
 		},
-		created_by: {
-			type: DataTypes.INTEGER,
-			allowNull: false,
-		},
-		updated_by: {
-			type: DataTypes.INTEGER,
-			allowNull: true,
-		},
 		host: {
 			type: DataTypes.STRING(200),
 			allowNull: false,
@@ -39,6 +31,14 @@ const DatabaseModel = MyDB.define(
 		password: {
 			type: DataTypes.TEXT,
 			allowNull: false,
+		},
+		created_by: {
+			type: DataTypes.INTEGER,
+			allowNull: false,
+		},
+		updated_by: {
+			type: DataTypes.INTEGER,
+			allowNull: true,
 		},
 		created_at: {
 			type: DataTypes.BIGINT,
