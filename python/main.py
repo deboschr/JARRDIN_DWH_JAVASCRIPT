@@ -11,19 +11,19 @@ from _load import load_data_stg, load_data_dwh
 DB_CONFIG = {
     "dwh": {
         "host": "jadiin-developer.com",
-        "database_name": "jadiinde_jarrdin_dwh",
+        "db_name": "jadiinde_jarrdin_dwh",
         "username": "jadiinde_jarrdin_dwh",
         "password": "XV6HFaZvU5FNuJ9EVdLX"
     },
     "stg": {
         "host": "jadiin-developer.com",
-        "database_name": "jadiinde_jarrdin_stg",
+        "db_name": "jadiinde_jarrdin_stg",
         "username": "jadiinde_jarrdin_stg",
         "password": "3UBETVp9Se8VsKVUBeJy"
     },
     "opt1": {
         "host": "jadiin-developer.com",
-        "database_name": "jadiinde_jarrdin_opt1",
+        "db_name": "jadiinde_jarrdin_opt1",
         "username": "jadiinde_jarrdin_opt1",
         "password": "76a4ELsFxPkRhhaUeJEX"
     }

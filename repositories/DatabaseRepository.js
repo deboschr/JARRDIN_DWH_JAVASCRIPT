@@ -24,7 +24,6 @@ class DatabaseRepository {
 		try {
 			const findDatabase = await DatabaseModel.findOne({
 				where: { db_name: db_name },
-				raw: true,
 				include: [
 					{
 						model: UserModel,
@@ -44,14 +43,14 @@ class DatabaseRepository {
 			const formattedResult = findDatabase
 				? {
 						database_id: findDatabase?.database_id,
+						host: findDatabase?.host,
+						port: findDatabase?.port,
 						db_name: findDatabase?.db_name,
 						username: findDatabase?.username,
 						password: findDatabase?.password,
-						host: findDatabase?.host,
-						port: findDatabase?.port,
 						created_by: findDatabase?.creator?.name,
 						created_at: findDatabase?.created_at,
-						updated_by: findDatabase?.updator?.name,
+						updated_by: findDatabase.updator ? findDatabase.updator.name : null,
 						updated_at: findDatabase?.updated_at,
 				  }
 				: undefined;
@@ -66,7 +65,6 @@ class DatabaseRepository {
 		try {
 			const findDatabase = await DatabaseModel.findOne({
 				where: { database_id: database_id },
-				raw: true,
 				include: [
 					{
 						model: UserModel,
@@ -86,14 +84,14 @@ class DatabaseRepository {
 			const formattedResult = findDatabase
 				? {
 						database_id: findDatabase?.database_id,
+						host: findDatabase?.host,
+						port: findDatabase?.port,
 						db_name: findDatabase?.db_name,
 						username: findDatabase?.username,
 						password: findDatabase?.password,
-						host: findDatabase?.host,
-						port: findDatabase?.port,
 						created_by: findDatabase?.creator?.name,
 						created_at: findDatabase?.created_at,
-						updated_by: findDatabase?.updator?.name,
+						updated_by: findDatabase.updator ? findDatabase.updator.name : null,
 						updated_at: findDatabase?.updated_at,
 				  }
 				: undefined;

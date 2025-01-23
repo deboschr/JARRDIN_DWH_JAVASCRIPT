@@ -1,0 +1,20 @@
+{
+	"dwh": {
+		"host": "jadiin-developer.com",
+		"db_name": "jadiinde_jarrdin_dwh",
+		"username": "jadiinde_jarrdin_dwh",
+		"password": "XV6HFaZvU5FNuJ9EVdLX"
+	},
+	"stg": {
+		"host": "jadiin-developer.com",
+		"db_name": "jadiinde_jarrdin_stg",
+		"username": "jadiinde_jarrdin_stg",
+		"password": "3UBETVp9Se8VsKVUBeJy"
+	},
+	"opt1": {
+		"host": "jadiin-developer.com",
+		"db_name": "jadiinde_jarrdin_opt1",
+		"username": "jadiinde_jarrdin_opt1",
+		"password": "76a4ELsFxPkRhhaUeJEX"
+	}
+}

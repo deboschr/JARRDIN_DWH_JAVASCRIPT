@@ -64,7 +64,7 @@ class UserController {
 
 	static async getAll(req, res) {
 		try {
-			let readUser = await UserService.readAll();
+			let readUser = await UserService.findUser();
 
 			res.status(200).json(readUser);
 		} catch (error) {

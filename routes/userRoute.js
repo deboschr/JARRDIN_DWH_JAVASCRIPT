@@ -6,7 +6,7 @@ const { Authorization } = require("../middlewares/Authorization");
 
 router.post("/signin", UserController.signin);
 router.post("/signup", Authorization.decryption, UserController.signup);
-router.post("/signout", Authorization.decryption, UserController.signout);
+router.delete("/signout", Authorization.decryption, UserController.signout);
 
 router.get("/", Authorization.decryption, UserController.getAll);
 router.get("/:id", Authorization.decryption, UserController.getOne);

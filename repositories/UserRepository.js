@@ -23,7 +23,14 @@ class UserRepository {
 		try {
 			const findUser = await UserModel.findOne({
 				where: { email: email, status: "active" },
-				attributes: ["user_id", "name", "email", "password"],
+				attributes: [
+					"user_id",
+					"name",
+					"email",
+					"password",
+					"created_at",
+					"updated_at",
+				],
 				raw: true,
 			});
 
@@ -38,7 +45,14 @@ class UserRepository {
 			const findUser = await UserModel.findOne({
 				where: { user_id: user_id },
 				raw: true,
-				attributes: ["user_id", "name", "email", "status"],
+				attributes: [
+					"user_id",
+					"name",
+					"email",
+					"status",
+					"created_at",
+					"updated_at",
+				],
 			});
 
 			return findUser;
@@ -104,7 +118,14 @@ class UserRepository {
 
 			await transaction.commit();
 
-			return findUser;
+			return {
+				user_id: findUser.user_id,
+				name: findUser.name,
+				email: findUser.email,
+				status: findUser.status,
+				created_at: findUser.created_at,
+				updated_at: findUser.updated_at,
+			};
 		} catch (error) {
 			if (transaction) await transaction.rollback();
 

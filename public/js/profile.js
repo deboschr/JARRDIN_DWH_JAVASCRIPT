@@ -55,7 +55,7 @@ function signOut() {
 	const button = document.getElementById("signOutButton");
 	button.addEventListener("click", function () {
 		fetch("/api/v1/user/signout", {
-			method: "POST",
+			method: "DELETE",
 		})
 			.then((response) => {
 				if (response.ok) {
