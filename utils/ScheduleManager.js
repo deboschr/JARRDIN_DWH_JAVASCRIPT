@@ -1,7 +1,6 @@
 const schedule = require("node-schedule");
-const { JobModel } = require("../models/JobModel");
-const { DatabaseModel } = require("../models/DatabaseModel");
-
+const { JobRepository } = require("../repositories/JobRepository.js");
+const { runETL } = require("./etl/etl.js");
 class ScheduleManager {
 	static createTask(dataJob) {
 		try {
@@ -15,66 +14,46 @@ class ScheduleManager {
 
 			const job = schedule.scheduleJob(dataJob.name, dataJob.cron, async () => {
 				try {
-					const findJob = await JobModel.findOne({
-						where: { name: dataJob.name },
-						attributes: [
-							"name",
-							"source_tables",
-							"destination_tables",
-							"duplicate_keys",
-							"transform_script",
-						],
-						include: [
-							{
-								model: DatabaseModel,
-								required: true,
-								attributes: ["host", "db_name", "username", "password"],
-								as: "source_db",
-							},
-							{
-								model: DatabaseModel,
-								required: true,
-								attributes: ["host", "db_name", "username", "password"],
-								as: "destination_db",
-							},
-						],
-					});
+					const findJob = await JobRepository.readOneByName(identifier.name);
 
 					if (!findJob) {
-						throw new Error(`Job dengan nama ${dataJob.name} tidak ditemukan.`);
+						const newError = new Error(`Job not found.`);
+						newError.status = 404;
+						throw newError;
 					}
 
-					await etl(dataJob);
+					if (findJob.status === "INACTIVE") {
+						this.cancelTask(findJob.name);
+					}
 
-					const currDate = new Date().toLocaleString();
-					console.log(`Job ${dataJob.name} selesai pada ${currDate}`);
-				} catch (etlError) {
-					console.error(
-						`Error dalam ETL untuk job ${dataJob.name}: ${etlError.message}`
+					await runETL(dataJob);
+
+					console.log(
+						`## Job[${dataJob.name}] - ${new Date().toLocaleString()}`
 					);
+				} catch (error) {
+					throw error;
 				}
 			});
 		} catch (error) {
+			console.error(error);
 			throw error;
 		}
 	}
 
 	static cancelTask(jobName) {
 		try {
-			const job = this.JOBS[jobName];
-
-			if (job) {
-				job.cancel();
-
-				delete this.JOBS[jobName];
-
-				console.log(
-					`Job ${jobName} telah dibatalkan dan dihapus dari database.`
-				);
-			} else {
-				console.log(`Job ${jobName} tidak ditemukan di instance JOBS.`);
+			if (!schedule.scheduledJobs[jobName]) {
+				const newError = new Error(`Job not found.`);
+				newError.status = 404;
+				throw newError;
 			}
+
+			const job = schedule.scheduledJobs[jobName];
+
+			job.cancel();
 		} catch (error) {
+			console.error(error);
 			throw error;
 		}
 	}

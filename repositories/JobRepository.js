@@ -47,10 +47,16 @@ class JobRepository {
 						name: findJob?.name,
 						cron: findJob?.cron,
 						source_db: findJob?.source_db,
-						source_tables: findJob?.source_tables,
+						source_tables: findJob?.source_tables
+							? JSON.parse(findJob?.source_tables)
+							: [],
 						destination_db: findJob?.destination_db,
-						destination_tables: findJob?.destination_tables,
-						duplicate_keys: findJob?.duplicate_keys,
+						destination_tables: findJob?.destination_tables
+							? JSON.parse(findJob?.destination_tables)
+							: [],
+						duplicate_keys: findJob?.duplicate_keys
+							? JSON.parse(findJob?.duplicate_keys)
+							: [],
 						transform_script: findJob?.transform_script,
 						status: findJob?.status,
 						created_at: findJob?.created_at,
@@ -104,14 +110,14 @@ class JobRepository {
 						source_db: findJob?.source_db,
 						source_tables: findJob?.source_tables
 							? JSON.parse(findJob?.source_tables)
-							: "",
+							: [],
 						destination_db: findJob?.destination_db,
 						destination_tables: findJob?.destination_tables
 							? JSON.parse(findJob?.destination_tables)
-							: "",
+							: [],
 						duplicate_keys: findJob?.duplicate_keys
 							? JSON.parse(findJob?.duplicate_keys)
-							: "",
+							: [],
 						transform_script: findJob?.transform_script,
 						status: findJob?.status,
 						created_by: findJob?.creator?.name,
