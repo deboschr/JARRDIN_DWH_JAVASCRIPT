@@ -28,6 +28,8 @@ class JobService {
 	}
 
 	static async createJob(dataJob, dataSession) {
+		const transaction = await MyDB.transaction();
+
 		try {
 			const findJob = await JobRepository.readOneByName(dataJob.name);
 
@@ -37,8 +39,6 @@ class JobService {
 				throw newError;
 			}
 
-			const transaction = await MyDB.transaction();
-
 			const newJob = await JobRepository.create(
 				dataJob,
 				dataSession,
@@ -47,28 +47,57 @@ class JobService {
 
 			ScheduleManager.createTask(newJob);
 
+			await transaction.commit();
+
 			return newJob;
 		} catch (error) {
+			if (transaction) {
+				await transaction.rollback();
+			}
+
 			throw error;
 		}
 	}
 
 	static async updateJob(dataJob, dataSession) {
+		const transaction = await MyDB.transaction();
+
 		try {
-			const updatedJob = await JobRepository.update(dataJob, dataSession);
+			const updatedJob = await JobRepository.update(
+				dataJob,
+				dataSession,
+				transaction
+			);
+
+			ScheduleManager.cancelTask(updatedJob.name);
+			ScheduleManager.createTask(updatedJob);
+
+			await transaction.commit();
 
 			return updatedJob;
 		} catch (error) {
+			if (transaction) {
+				await transaction.rollback();
+			}
+
 			throw error;
 		}
 	}
 
 	static async deleteJob(jobId) {
-		try {
-			const updatedJob = await JobRepository.delete(jobId);
+		const transaction = await MyDB.transaction();
 
-			return updatedJob;
+		try {
+			const deletedJob = await JobRepository.delete(jobId);
+
+			ScheduleManager.cancelTask(deletedJob.name);
+
+			return deletedJob;
 		} catch (error) {
+			if (transaction) {
+				await transaction.rollback();
+			}
+
 			throw error;
 		}
 	}

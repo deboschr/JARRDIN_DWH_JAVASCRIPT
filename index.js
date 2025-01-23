@@ -30,7 +30,7 @@ DatabaseConnection.authenticate()
 		const routes = require("./routes");
 		app.use("/", routes);
 
-		// await DatabaseConnection.synchronize();
+		// await DatabaseConnection.synchronize(true);
 
 		app.listen(PORT, () => {
 			console.log(`>> Server is running on http://localhost:${PORT}`);

@@ -36,10 +36,7 @@ class JobController {
 				throw newError;
 			}
 
-			const newJob = await JobService.createJob(
-				req.body,
-				req.dataSession
-			);
+			const newJob = await JobService.createJob(req.body, req.dataSession);
 
 			res.status(200).json({ success: true, data: newJob });
 		} catch (error) {
@@ -77,9 +74,7 @@ class JobController {
 
 	static async delete(req, res) {
 		try {
-			const deleteJob = await JobService.deleteJob(
-				req.params.id
-			);
+			const deleteJob = await JobService.deleteJob(req.params.id);
 
 			res.status(200).json({ success: true });
 		} catch (error) {
