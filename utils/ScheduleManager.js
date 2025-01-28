@@ -26,6 +26,11 @@ class ScheduleManager {
 						this.cancelTask(findJob.name);
 					}
 
+					dataJob.last_execute =
+						data.created_at > data.updated_at
+							? new Date(data.created_at)
+							: new Date(data.updated_at);
+
 					await runETL(dataJob);
 
 					console.log(

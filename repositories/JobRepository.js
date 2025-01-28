@@ -59,8 +59,8 @@ class JobRepository {
 							: [],
 						transform_script: findJob?.transform_script,
 						status: findJob?.status,
-						created_at: findJob?.created_at,
-						updated_at: findJob?.updated_at,
+						created_at: findJob.created_at ? findJob.created_at : 0,
+						updated_at: findJob.updated_at ? findJob.updated_at : 0,
 				  }
 				: undefined;
 
@@ -161,7 +161,7 @@ class JobRepository {
 
 			return createJob;
 		} catch (error) {
-			if (transaction && !transaction.finished) {
+			if (transaction && !globalTransaction) {
 				await transaction.rollback();
 			}
 
@@ -175,10 +175,12 @@ class JobRepository {
 		}
 	}
 
-	static async update(dataJob, dataSession) {
+	static async update(dataJob, dataSession, globalTransaction) {
 		let transaction;
 		try {
-			transaction = await MyDB.transaction();
+			transaction = globalTransaction
+				? globalTransaction
+				: await MyDB.transaction();
 
 			const findJob = await JobModel.findOne({
 				where: { job_id: dataJob.job_id },
@@ -209,20 +211,26 @@ class JobRepository {
 				{ transaction }
 			);
 
-			await transaction.commit();
+			if (!globalTransaction) {
+				await transaction.commit();
+			}
 
 			return findJob;
 		} catch (error) {
-			if (transaction) await transaction.rollback();
+			if (transaction && !globalTransaction) {
+				await transaction.rollback();
+			}
 
 			throw error;
 		}
 	}
 
-	static async delete(job_id) {
+	static async delete(job_id, globalTransaction) {
 		let transaction;
 		try {
-			transaction = await MyDB.transaction();
+			transaction = globalTransaction
+				? globalTransaction
+				: await MyDB.transaction();
 
 			const findJob = await JobModel.findOne({
 				where: { job_id: job_id },
@@ -236,11 +244,15 @@ class JobRepository {
 
 			await findJob.destroy({ transaction });
 
-			await transaction.commit();
+			if (!globalTransaction) {
+				await transaction.commit();
+			}
 
 			return findJob;
 		} catch (error) {
-			if (transaction) await transaction.rollback();
+			if (transaction && !globalTransaction) {
+				await transaction.rollback();
+			}
 
 			throw error;
 		}
